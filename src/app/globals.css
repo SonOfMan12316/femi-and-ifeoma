@@ -1,26 +1,98 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Logo palette */
+  --orange: #f98d2a;
+  --white: #ffffff;
+  --brick: #b03825;
+
+  --cream: var(--white);
+  --ink: var(--brick);
+  --ember: var(--orange);
+  --sand: #fff4e8;
+  --ink-muted: rgba(176, 56, 37, 0.78);
+  --ink-soft: rgba(176, 56, 37, 0.58);
+  --ink-line: rgba(176, 56, 37, 0.14);
+  --cream-soft: rgba(255, 255, 255, 0.9);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-ember: var(--ember);
+  --color-sand: var(--sand);
+  --color-orange: var(--orange);
+  --color-brick: var(--brick);
+  --color-white: var(--white);
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-dm-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--white);
+  color: var(--brick);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-animate {
+  opacity: 0;
+  animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-animate-delay-1 {
+  animation-delay: 0.12s;
+}
+.hero-animate-delay-2 {
+  animation-delay: 0.24s;
+}
+.hero-animate-delay-3 {
+  animation-delay: 0.36s;
+}
+.hero-animate-delay-4 {
+  animation-delay: 0.48s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-animate {
+    animation: none;
+    opacity: 1;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
