@@ -24,7 +24,7 @@ export function Nav() {
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2">
         <a href="/" aria-label={site.fullName}>
-          <Logo size={44} priority />
+          <Logo size={60} priority />
         </a>
 
         {/* Desktop nav */}
