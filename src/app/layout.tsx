@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fémi & Ifeoma Cat Café",
     description:
-      "Nigeria's first cat café — slow afternoons with Maine Coons, Persians, and more in Victoria Island, Lagos.",
+      "Nigeria's first cat café. Slow afternoons with Maine Coons, Persians, and more in Victoria Island, Lagos.",
     type: "website",
   },
 };

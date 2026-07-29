@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: `Our Cats · ${site.fullName}`,
-  description: `Meet the resident cats of ${site.fullName} — British Shorthairs, Maine Coons, Persians, and more.`,
+  description: `Meet the resident cats of ${site.fullName}: British Shorthairs, Maine Coons, Persians, and more.`,
 };
 
 export default function OurCatsPage() {

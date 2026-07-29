@@ -23,7 +23,7 @@ const SESSION = {
   duration: "60 minutes",
   price: site.price,
   description:
-    "PER PERSON: One full hour in our lounge with resident cats — British Shorthairs, Maine Coons, Persians, and more. Includes a complimentary drink on arrival and workstation access. Visitors under 12 must be accompanied by an adult.",
+    "PER PERSON: One full hour in our lounge with resident cats: British Shorthairs, Maine Coons, Persians, and more. Includes a complimentary drink on arrival and workstation access. Visitors under 12 must be accompanied by an adult.",
 };
 
 const TIME_SLOTS = [
@@ -167,7 +167,7 @@ export function BookingFlow() {
           <button
             type="button"
             onClick={() => setStep("datetime")}
-            className="shrink-0 bg-brick px-6 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange"
+            className="shrink-0 rounded-lg bg-brick px-6 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange"
           >
             Book
           </button>
@@ -195,7 +195,7 @@ export function BookingFlow() {
               <button
                 type="button"
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="flex h-8 w-8 items-center justify-center border border-[var(--ink-line)] text-brick hover:bg-sand"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--ink-line)] text-brick hover:bg-sand"
               >
                 −
               </button>
@@ -203,7 +203,7 @@ export function BookingFlow() {
               <button
                 type="button"
                 onClick={() => setQty((q) => q + 1)}
-                className="flex h-8 w-8 items-center justify-center border border-[var(--ink-line)] text-brick hover:bg-sand"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--ink-line)] text-brick hover:bg-sand"
               >
                 +
               </button>
@@ -227,7 +227,7 @@ export function BookingFlow() {
                       key={slot}
                       type="button"
                       onClick={() => setSelectedTime(slot)}
-                      className={`border px-4 py-3 text-left text-[14px] transition-colors ${
+                      className={`rounded-lg border px-4 py-3 text-left text-[14px] transition-colors ${
                         selectedTime === slot
                           ? "border-brick bg-brick text-white"
                           : "border-[var(--ink-line)] text-brick hover:border-brick"
@@ -253,7 +253,7 @@ export function BookingFlow() {
               <button
                 type="button"
                 onClick={() => setStep("info")}
-                className="bg-brick px-8 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white hover:bg-orange"
+                className="rounded-lg bg-brick px-8 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white hover:bg-orange"
               >
                 Select &amp; Continue
               </button>
@@ -340,7 +340,7 @@ export function BookingFlow() {
                   required
                   value={info[key]}
                   onChange={(e) => setInfo((prev) => ({ ...prev, [key]: e.target.value }))}
-                  className="w-full border border-[var(--ink-line)] bg-white px-4 py-3 text-[14px] text-brick outline-none focus:border-brick"
+                  className="w-full rounded-lg border border-[var(--ink-line)] bg-white px-4 py-3 text-[14px] text-brick outline-none focus:border-brick"
                 />
               </div>
             ))}
@@ -368,7 +368,7 @@ export function BookingFlow() {
             <button
               type="submit"
               disabled={!info.agreed}
-              className="bg-brick px-10 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-brick px-10 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange disabled:cursor-not-allowed disabled:opacity-50"
             >
               Continue to Payment
             </button>
@@ -399,7 +399,7 @@ export function BookingFlow() {
           setQty(1);
           setInfo({ firstName: "", lastName: "", email: "", phone: "", agreed: false });
         }}
-        className="mt-8 border border-brick px-8 py-3 text-[12px] uppercase tracking-wide text-brick hover:bg-brick hover:text-white"
+        className="mt-8 rounded-lg border border-brick px-8 py-3 text-[12px] uppercase tracking-wide text-brick hover:bg-brick hover:text-white"
       >
         Book Another Visit
       </button>

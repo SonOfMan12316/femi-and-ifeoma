@@ -14,7 +14,7 @@ export function Intro() {
           moving on without you.
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-[17px] font-light leading-relaxed text-[var(--ink-muted)]">
-          Work, unwind, and meet the cats of Fémi &amp; Ifeoma — Nigeria&apos;s
+          Work, unwind, and meet the cats of Fémi &amp; Ifeoma, Nigeria&apos;s
           first cat café.
         </p>
         <a

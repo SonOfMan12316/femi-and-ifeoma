@@ -27,7 +27,6 @@ export default function BookYourVisitPage() {
               sizes="100vw"
             />
           </div>
-          <div className="absolute inset-0 bg-brick/50" />
           <div className="relative z-10 w-full px-6 pb-16 md:pb-20">
             <div className="mx-auto max-w-5xl">
               <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.22em] text-orange">

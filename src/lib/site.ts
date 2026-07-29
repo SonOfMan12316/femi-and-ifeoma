@@ -72,7 +72,7 @@ export const faqs = [
   {
     question: "What is a cat café?",
     answer:
-      "A calm space where you can sip something warm, work or unwind, and spend time with our resident cats — British Shorthairs, Maine Coons, Persians, and more.",
+      "A calm space where you can sip something warm, work or unwind, and spend time with our resident cats: British Shorthairs, Maine Coons, Persians, and more.",
   },
   {
     question: "Do I need a reservation?",
@@ -96,13 +96,13 @@ export const faqs = [
   {
     question: "Can I work from the café?",
     answer:
-      "Yes. Bring your laptop — every session includes use of the workstation for the full hour.",
+      "Yes. Bring your laptop every session includes use of the workstation for the full hour.",
   },
 ] as const;
 
 export const houseRules = [
   "Reservations are required for every visit.",
-  "Be gentle — let the cats come to you.",
+  "Be gentle. Let the cats come to you.",
   "No flash photography or loud calls in the lounge.",
   "Food and drinks from outside are not allowed.",
   "Please wash or sanitize your hands before meeting the cats.",

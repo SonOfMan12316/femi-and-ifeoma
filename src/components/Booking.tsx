@@ -26,7 +26,7 @@ export function Booking() {
               href={site.bookingUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-10 inline-block bg-orange px-9 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-brick"
+              className="mt-10 inline-block rounded-lg bg-brick px-9 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange"
             >
               Book Your Visit
             </a>
@@ -48,9 +48,9 @@ export function Booking() {
                 What&apos;s included
               </h3>
               <ul className="m-0 list-none space-y-2 p-0 text-[16px] font-light">
-                <li>— Full access to the lounge and all resident cats</li>
-                <li>— Use of the workstation for the full session</li>
-                <li>— Complimentary drink on arrival</li>
+                <li>Full access to the lounge and all resident cats</li>
+                <li>Use of the workstation for the full session</li>
+                <li>Complimentary drink on arrival</li>
               </ul>
             </div>
             <div>

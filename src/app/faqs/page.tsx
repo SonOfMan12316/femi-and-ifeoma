@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: `FAQs · ${site.fullName}`,
-  description: `Answers to common questions about ${site.fullName} — pricing, reservations, house rules, and more.`,
+  description: `Answers to common questions about ${site.fullName}: pricing, reservations, house rules, and more.`,
 };
 
 export default function FaqsPage() {

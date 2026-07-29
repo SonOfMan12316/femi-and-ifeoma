@@ -18,7 +18,7 @@ export function Faqs() {
             Are you curious?
           </h2>
           <p className="mt-4 text-[17px] font-light leading-relaxed text-[var(--ink-muted)]">
-            Of course you are — you are part cat. Here are answers to life&apos;s
+            Of course you are. You are part cat. Here are answers to life&apos;s
             most pressing café questions.
           </p>
         </Reveal>
