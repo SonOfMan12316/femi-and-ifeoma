@@ -3,7 +3,6 @@ import { ContentBlock } from "@/components/ContentBlock";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { HouseRules } from "@/components/HouseRules";
-import { Intro } from "@/components/Intro";
 import { Nav } from "@/components/Nav";
 import { site } from "@/lib/site";
 
@@ -13,8 +12,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
-        <Intro />
-        <ContentBlock
+<ContentBlock
           eyebrow="Curious?"
           title="What in the world is a cat café?"
           body="Can I live here? Can I quit my job and work for you? How do you deal with all this cuteness in one place? Click below for answers to life's most pressing questions."
@@ -26,10 +24,11 @@ export default function Home() {
           }}
         />
         <ContentBlock
+          id="visit"
           reverse
           eyebrow="Visit us"
           title="Ready for a slow hour in Lagos?"
-          body={`Sessions are ${site.price} per person for a full hour with the cats, the lounge, and a complimentary drink. Reservations required — walk-ins only if space opens up.`}
+          body={`Sessions are ${site.price} per person for a full hour with the cats, the lounge, and a complimentary drink. Reservations required. Walk-ins only if space opens up.`}
           ctaLabel="Book Your Visit"
           ctaHref="/book-your-visit"
           image={{
