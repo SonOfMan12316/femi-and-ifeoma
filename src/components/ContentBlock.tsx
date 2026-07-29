@@ -60,25 +60,9 @@ export function ContentBlock({
             {...(external
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            className="group mt-9 inline-flex items-center gap-2 rounded-xl bg-brick px-8 py-3.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange hover:shadow-[0_6px_16px_rgba(176,56,37,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/30 focus-visible:ring-offset-2"
+            className="mt-9 inline-flex items-center rounded-xl bg-brick px-8 py-3.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange hover:shadow-[0_6px_16px_rgba(176,56,37,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/30 focus-visible:ring-offset-2"
           >
             {ctaLabel}
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 13 13"
-              fill="none"
-              aria-hidden="true"
-              className="transition-transform duration-200 group-hover:translate-x-0.5"
-            >
-              <path
-                d="M1 6.5H12M6.5 1L12 6.5L6.5 12"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </a>
         </Reveal>
       </div>
