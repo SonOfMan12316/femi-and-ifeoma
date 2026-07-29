@@ -2,15 +2,20 @@ import Image from "next/image";
 
 type LogoProps = {
   size?: number;
+  width?: number;
+  height?: number;
   className?: string;
   priority?: boolean;
 };
 
-export function Logo({ size = 48, className = "", priority = false }: LogoProps) {
+export function Logo({ size = 48, width, height, className = "", priority = false }: LogoProps) {
+  const w = width ?? size;
+  const h = height ?? size;
+
   return (
     <span
       className={`relative inline-block shrink-0 ${className}`}
-      style={{ width: size, height: size }}
+      style={{ width: w, height: h }}
     >
       <Image
         src="/uploads/femi-and-ifeoma-logo.jpg"
@@ -18,7 +23,7 @@ export function Logo({ size = 48, className = "", priority = false }: LogoProps)
         fill
         priority={priority}
         className="object-contain"
-        sizes={`${size}px`}
+        sizes={`${w}px`}
       />
     </span>
   );
