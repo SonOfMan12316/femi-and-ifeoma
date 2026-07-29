@@ -38,15 +38,21 @@ body {
   font-family: var(--font-dm-sans), system-ui, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
+
+/* ─────────────────────────────────────────
+   Scroll reveal
+───────────────────────────────────────── */
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -56,10 +62,10 @@ a {
 
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(20px);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .reveal.is-visible {
@@ -67,23 +73,60 @@ a {
   transform: translateY(0);
 }
 
+/* ─────────────────────────────────────────
+   Hero entrance animations
+───────────────────────────────────────── */
+
 .hero-animate {
   opacity: 0;
   animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.hero-animate-delay-1 {
-  animation-delay: 0.12s;
+.hero-animate-delay-1 { animation-delay: 0.10s; }
+.hero-animate-delay-2 { animation-delay: 0.22s; }
+.hero-animate-delay-3 { animation-delay: 0.36s; }
+.hero-animate-delay-4 { animation-delay: 0.50s; }
+.hero-animate-delay-5 { animation-delay: 0.62s; }
+
+/* ─────────────────────────────────────────
+   Hero image — Ken Burns
+
+   IMPORTANT: opacity is intentionally NOT animated here.
+   Animating opacity on the <img> element alongside a
+   transform forces the browser to rasterize the GPU
+   compositing layer at CSS pixel density, not device pixel
+   density — causing visible blur on Retina displays.
+
+   Instead, a separate cover <div> fades out to reveal the
+   image. The image itself is always opacity: 1, so it is
+   always composited at native device resolution.
+───────────────────────────────────────── */
+
+@keyframes hero-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.05); }
 }
-.hero-animate-delay-2 {
-  animation-delay: 0.24s;
+
+/* Applied to the wrapper div, not the <img> */
+.hero-image-zoom {
+  will-change: transform;
+  animation: hero-zoom 28s ease-out forwards;
 }
-.hero-animate-delay-3 {
-  animation-delay: 0.36s;
+
+/* Black cover that fades out, revealing the image cleanly */
+@keyframes cover-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
-.hero-animate-delay-4 {
-  animation-delay: 0.48s;
+
+.hero-cover {
+  animation: cover-out 1.6s ease forwards;
+  pointer-events: none;
 }
+
+/* ─────────────────────────────────────────
+   Accessibility
+───────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   .hero-animate {
@@ -94,5 +137,16 @@ a {
   .reveal {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+
+  .hero-image-zoom {
+    animation: none;
+    will-change: auto;
+  }
+
+  .hero-cover {
+    animation: none;
+    opacity: 0;
   }
 }
