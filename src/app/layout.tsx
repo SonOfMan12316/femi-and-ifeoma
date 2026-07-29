@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { PageLoader } from "@/components/PageLoader";
 
 const poppins = Poppins({
   variable: "--font-dm-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
       className={`${poppins.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-white font-sans text-brick">
+        <PageLoader />
         {children}
       </body>
     </html>

@@ -6,6 +6,9 @@
   --white: #ffffff;
   --brick: #b03825;
 
+  /* Image fade duration — collapsed to 0s for reduced-motion users */
+  --img-fade-duration: 0.65s;
+
   --cream: var(--white);
   --ink: var(--brick);
   --ember: var(--orange);
@@ -125,10 +128,36 @@ body {
 }
 
 /* ─────────────────────────────────────────
+   Page loader
+───────────────────────────────────────── */
+
+@keyframes loader-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.loader-sweep {
+  animation: loader-sweep 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes loader-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.loader-content {
+  animation: loader-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─────────────────────────────────────────
    Accessibility
 ───────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --img-fade-duration: 0s;
+  }
+
   .hero-animate {
     animation: none;
     opacity: 1;
@@ -148,5 +177,14 @@ body {
   .hero-cover {
     animation: none;
     opacity: 0;
+  }
+
+  .loader-sweep {
+    animation: none;
+    opacity: 0.3;
+  }
+
+  .loader-content {
+    animation: none;
   }
 }

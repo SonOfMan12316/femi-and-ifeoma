@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { FadeImage } from "@/components/FadeImage";
 import { Reveal } from "@/components/Reveal";
 import { cats } from "@/lib/site";
 
@@ -42,7 +42,7 @@ export function Cats() {
                   className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand transition-shadow duration-[360ms] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.13),0_4px_12px_rgba(0,0,0,0.06)]"
                   style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}
                 >
-                  <Image
+                  <FadeImage
                     src={cat.photo}
                     alt={`${cat.name}, ${cat.breed}`}
                     fill

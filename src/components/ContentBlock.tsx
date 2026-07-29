@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { FadeImage } from "@/components/FadeImage";
 import { Reveal } from "@/components/Reveal";
 
 type ContentBlockProps = {
@@ -33,8 +33,8 @@ export function ContentBlock({
       >
         {image ? (
           <Reveal>
-            <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl md:aspect-[5/6]">
-              <Image
+            <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand md:aspect-[5/6]">
+              <FadeImage
                 src={image.src}
                 alt={image.alt}
                 fill
