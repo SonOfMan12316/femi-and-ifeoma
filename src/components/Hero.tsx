@@ -1,37 +1,55 @@
+import Image from "next/image";
 import { site } from "@/lib/site";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[80vh] items-center overflow-hidden">
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url(/uploads/femi-and-ifeoma.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center 30%",
-        }}
-      />
-      <div className="absolute inset-0 bg-brick/55" />
+    <section className="relative flex min-h-[93vh] flex-col justify-end overflow-hidden">
 
-      <div className="relative z-10 w-full px-6 py-20 md:px-16 md:py-28">
-        <div className="max-w-xl">
-          <p className="hero-animate hero-animate-delay-1 mb-5 text-[11px] font-medium uppercase tracking-[0.22em] text-orange">
-            ★ Reservations required ★
-          </p>
-          <h1 className="hero-animate hero-animate-delay-2 text-[clamp(2.4rem,5vw,4rem)] font-semibold leading-[1.1] text-white">
-            Come spend time with our cats in a cozy, playful atmosphere.
+      {/*
+        Image wrapper — Ken Burns transform only.
+        The <img> itself has NO opacity animation so the browser
+        creates its GPU compositing layer at device pixel density
+        (full Retina resolution) rather than CSS pixel density.
+        will-change: transform pre-promotes the layer before the
+        animation starts, locking in native-resolution rasterisation.
+      */}
+      <div className="hero-image-zoom absolute inset-0">
+        <Image
+          src="/uploads/E89AFD51-5318-4497-AEF4-605D8B4395EB 2.jpg"
+          alt="Cat at Femi & Ifeoma Cat Café"
+          fill
+          priority
+          quality={95}
+          className="object-cover"
+          style={{ objectPosition: "20% center" }}
+          sizes="100vw"
+        />
+      </div>
+
+      {/* Static gradient overlay — always present, no animation */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/18 to-transparent" />
+
+      {/*
+        Black cover that fades OUT on load.
+        This is what creates the page-load reveal effect — not
+        an opacity animation on the image. After 1.6s it reaches
+        opacity: 0 and stops interfering entirely.
+      */}
+      <div className="hero-cover absolute inset-0 bg-black" />
+
+      {/* Hero content */}
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 md:pb-28">
+        <div className="max-w-[580px]">
+
+          <h1 className="hero-animate hero-animate-delay-1 font-display text-[clamp(3rem,6.5vw,5.5rem)] font-bold leading-[1.04] tracking-[-0.025em] text-white">
+            A slow hour<br /> with cats.
           </h1>
-          <p className="hero-animate hero-animate-delay-3 mt-5 text-[14px] font-light text-white/70">
-            {site.tagline} &middot; {site.location}
+
+          <p className="hero-animate hero-animate-delay-2 mt-6 text-[16.5px] font-light leading-[1.75] text-white/65">
+            {site.sessionLength} for {site.price} per person, lounge access
+            and a welcome drink included.
           </p>
-          <div className="hero-animate hero-animate-delay-4 mt-10">
-            <a
-              href="/book-your-visit"
-              className="inline-block bg-orange px-10 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-brick"
-            >
-              Book Your Visit
-            </a>
-          </div>
+
         </div>
       </div>
     </section>
