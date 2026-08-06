@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { PageLoader } from "@/components/PageLoader";
 
@@ -7,6 +7,14 @@ const poppins = Poppins({
   variable: "--font-dm-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -29,9 +37,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} h-full antialiased`}
+      className={`${poppins.variable} ${cormorantGaramond.variable} h-full antialiased`}
     >
-      <body className="min-h-full overflow-x-hidden bg-white font-sans text-brick">
+      <body className="min-h-full overflow-x-hidden bg-cream font-sans text-black">
         <PageLoader />
         {children}
       </body>
