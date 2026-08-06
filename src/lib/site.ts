@@ -11,6 +11,7 @@ export const site = {
   hours: "Monday – Saturday, 10AM – 5PM (GMT+1)",
   closed: "Closed Sundays",
   email: "hello@femiandifeoma.com",
+  phone: "+234 706 484 7573",
   paystackPublicKey: process.env.NEXT_PUBLIC_PAYSTACK_KEY ?? "",
   priceKobo: 3000000, // ₦30,000 in kobo
 } as const;
@@ -112,9 +113,9 @@ export const houseRules = [
 
 export const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/book-your-visit", label: "Book Your Visit" },
   { href: "/our-cats", label: "Our Cats" },
   { href: "/#about", label: "About Us" },
   { href: "/faqs", label: "FAQs" },
   { href: "/#rules", label: "House Rules" },
+  { href: "/book-your-visit", label: "Book Your Visit" },
 ] as const;

@@ -18,7 +18,7 @@ export function Logo({ size = 48, width, height, className = "", priority = fals
       style={{ width: w, height: h }}
     >
       <Image
-        src="/uploads/femi-and-ifeoma-logo.jpg"
+        src="/uploads/femi-and-ifeoma-wordmark.png"
         alt="Fémi & Ifeoma Cat Café"
         fill
         priority={priority}

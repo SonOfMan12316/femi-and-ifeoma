@@ -1,178 +1,150 @@
 import { Logo } from "@/components/Logo";
-import { site } from "@/lib/site";
+import { navLinks, site } from "@/lib/site";
 
-function IconPin() {
-  return (
-    <svg width="13" height="15" viewBox="0 0 13 15" fill="none" aria-hidden="true" className="mt-[2px] shrink-0">
-      <path
-        d="M6.5 1C3.74 1 1.5 3.24 1.5 6C1.5 9.75 6.5 14 6.5 14C6.5 14 11.5 9.75 11.5 6C11.5 3.24 9.26 1 6.5 1Z"
-        stroke="currentColor" strokeWidth="1.2" fill="none"
-      />
-      <circle cx="6.5" cy="6" r="1.75" stroke="currentColor" strokeWidth="1.2" />
-    </svg>
-  );
-}
-
-function IconClock() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="mt-[2px] shrink-0">
-      <circle cx="7" cy="7" r="5.75" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M7 4.5V7L8.75 8.75" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
+/* All social icons share one 18×18 box so sizing stays consistent. */
 
 function IconInstagram() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0">
-      <rect x="1.5" y="1.5" width="11" height="11" rx="3.25" stroke="currentColor" strokeWidth="1.2" />
-      <circle cx="7" cy="7" r="2.5" stroke="currentColor" strokeWidth="1.2" />
-      <circle cx="10.25" cy="3.75" r="0.65" fill="currentColor" />
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="14" height="14" rx="4" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="9" cy="9" r="3.25" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="13.15" cy="4.85" r="0.85" fill="currentColor" />
     </svg>
   );
 }
 
 function IconMap() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
       <path
-        d="M1 3.5L5 1.5L9 3.5L13 1.5V10.5L9 12.5L5 10.5L1 12.5V3.5Z"
-        stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" fill="none"
+        d="M9 2.25c-2.35 0-4.25 1.9-4.25 4.25 0 3.19 4.25 9.25 4.25 9.25s4.25-6.06 4.25-9.25c0-2.35-1.9-4.25-4.25-4.25Z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
       />
-      <path d="M5 1.5V10.5M9 3.5V12.5" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="9" cy="6.5" r="1.6" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   );
 }
 
 function IconMail() {
   return (
-    <svg width="15" height="12" viewBox="0 0 15 12" fill="none" aria-hidden="true" className="mt-[1px] shrink-0">
-      <rect x="1" y="1" width="13" height="10" rx="2" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M1 3.5L7.5 7.5L14 3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <rect x="2" y="4" width="14" height="10" rx="2.25" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M2.75 5.5 9 10l6.25-4.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
 
+const socials = [
+  {
+    label: "Instagram",
+    href: site.instagram,
+    external: true,
+    icon: <IconInstagram />,
+  },
+  {
+    label: "Find us on Google Maps",
+    href: "https://maps.google.com/?q=Fémi+and+Ifeoma+Cat+Café+Surulere+Lagos",
+    external: true,
+    icon: <IconMap />,
+  },
+  {
+    label: `Email ${site.email}`,
+    href: `mailto:${site.email}`,
+    external: false,
+    icon: <IconMail />,
+  },
+];
+
+const label = "text-[10px] font-medium uppercase tracking-[var(--tracking-label)] text-white/30";
+const value = "text-[14px] font-light leading-[1.7] text-white/60";
+const link =
+  "text-[14px] font-light leading-[1.7] text-white/60 transition-colors duration-[250ms] ease-out hover:text-orange";
+
 export function Footer() {
   return (
-    <footer className="bg-[var(--sand)]">
-      <div className="mx-auto max-w-6xl px-6">
+    <footer className="bg-black">
+      <div className="mx-auto max-w-3xl px-6 py-24 text-center md:py-28">
 
-        {/* ── Main grid ── */}
-        <div className="grid grid-cols-1 gap-14 py-20 md:py-24 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-10">
+        {/* ── Café name ── */}
+        <Logo width={200} height={64} className="brightness-0 invert" />
+        <p className="mt-6 text-[11px] font-medium uppercase tracking-[var(--tracking-label)] text-orange">
+          Relax, Purr &amp; Community
+        </p>
 
-          {/* Brand */}
-          <div className="max-w-xs">
-            <Logo width={120} height={40} />
-            <p className="mt-6 text-[20px] font-bold tracking-[-0.015em] text-brick">
-              {site.fullName}
+        {/* ── Navigation ── */}
+        <nav aria-label="Footer" className="mt-14">
+          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {navLinks.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className="text-[11px] font-medium uppercase tracking-[0.09em] text-white/40 transition-colors duration-[250ms] ease-out hover:text-orange"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* ── Address · Hours · Contact ── */}
+        <div className="mt-16 grid gap-12 sm:grid-cols-3 sm:gap-8">
+          <div>
+            <h3 className={label}>Address</h3>
+            <p className={`mt-4 ${value}`}>{site.location}</p>
+          </div>
+
+          <div>
+            <h3 className={label}>Opening Hours</h3>
+            <p className={`mt-4 ${value}`}>
+              Monday – Saturday
+              <br />
+              10 AM – 5 PM
             </p>
-            <p className="mt-2.5 text-[14px] font-light leading-[1.75] text-brick/55">
-              Lagos's first cat café. A calm, considered space to slow
-              down, breathe, and spend an hour with cats.
+            <p className="mt-2 text-[12px] font-light text-white/30">{site.closed}</p>
+          </div>
+
+          <div>
+            <h3 className={label}>Contact</h3>
+            <p className="mt-4">
+              <a href={`mailto:${site.email}`} className={link}>
+                {site.email}
+              </a>
+            </p>
+            <p className="mt-1">
+              <a href={`tel:${site.phone.replace(/\s/g, "")}`} className={link}>
+                {site.phone}
+              </a>
             </p>
           </div>
-
-          {/* Visit */}
-          <div>
-            <h3 className="mb-7 text-[10px] font-semibold uppercase tracking-[0.22em] text-brick/35">
-              Visit
-            </h3>
-            <ul className="space-y-5">
-              <li className="flex items-start gap-2.5 text-brick/55">
-                <IconPin />
-                <span className="text-[13.5px] font-light leading-[1.65]">
-                  {site.location}
-                </span>
-              </li>
-              <li className="flex items-start gap-2.5 text-brick/55">
-                <IconClock />
-                <div className="text-[13.5px] font-light leading-[1.65]">
-                  <span className="block">Mon – Sat</span>
-                  <span className="block">10 AM – 5 PM</span>
-                  <span className="mt-1.5 block text-[12px] text-brick/35">
-                    {site.closed}
-                  </span>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          {/* Explore */}
-          <div>
-            <h3 className="mb-7 text-[10px] font-semibold uppercase tracking-[0.22em] text-brick/35">
-              Explore
-            </h3>
-            <nav aria-label="Footer explore links">
-              <ul className="space-y-3.5">
-                {[
-                  { href: "/book-your-visit", label: "Book a Visit" },
-                  { href: "/our-cats",        label: "Our Cats"    },
-                  { href: "/faqs",            label: "FAQs"        },
-                  { href: "/#rules",          label: "House Rules" },
-                  { href: "/#about",          label: "About Us"    },
-                ].map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="text-[13.5px] font-light text-brick/55 transition-colors duration-200 hover:text-brick"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-
-          {/* Connect */}
-          <div>
-            <h3 className="mb-7 text-[10px] font-semibold uppercase tracking-[0.22em] text-brick/35">
-              Connect
-            </h3>
-            <ul className="space-y-4">
-              <li>
-                <a
-                  href={site.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 text-[13.5px] font-light text-brick/55 transition-colors duration-200 hover:text-orange"
-                >
-                  <IconInstagram />
-                  @femiandifeoma
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://maps.google.com/?q=Fémi+and+Ifeoma+Cat+Café+Surulere+Lagos"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 text-[13.5px] font-light text-brick/55 transition-colors duration-200 hover:text-orange"
-                >
-                  <IconMap />
-                  Find us on Maps
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`mailto:${site.email}`}
-                  className="flex items-center gap-2.5 text-[13.5px] font-light text-brick/55 transition-colors duration-200 hover:text-orange"
-                >
-                  <IconMail />
-                  {site.email}
-                </a>
-              </li>
-            </ul>
-          </div>
-
         </div>
 
-        {/* ── Bottom bar ── */}
-        <div className="flex flex-col gap-2 border-t border-brick/10 py-8 md:flex-row md:items-center md:justify-between">
-          <p className="text-[12px] font-light text-brick/35">
+        {/* ── Social ── */}
+        <ul className="mt-16 flex items-center justify-center gap-8">
+          {socials.map((social) => (
+            <li key={social.label}>
+              <a
+                href={social.href}
+                aria-label={social.label}
+                {...(social.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+                className="inline-flex text-white/40 transition-[color,transform] duration-[250ms] ease-out hover:-translate-y-0.5 hover:text-orange motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              >
+                {social.icon}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* ── Copyright ── */}
+        <div className="mt-20 border-t border-white/[0.08] pt-10">
+          <p className="text-[12px] font-light text-white/30">
             © 2026 {site.fullName}
           </p>
-          <p className="text-[12px] font-light text-brick/28">
+          <p className="mt-1.5 text-[12px] font-light text-white/20">
             Designed with care in Lagos, Nigeria
           </p>
         </div>
