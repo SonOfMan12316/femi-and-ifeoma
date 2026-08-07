@@ -8,6 +8,12 @@ export const site = {
   instagram: "https://instagram.com/femiandifeoma",
   founder: "@jasonthecatguy",
   location: "Surulere, Lagos, Nigeria",
+  address: "31 Adetola Street, Aguda",
+  addressCity: "Surulere, Lagos",
+  /* Opens Google Maps directions with the café pre-filled as the destination,
+     so the origin defaults to wherever the visitor is. */
+  mapsUrl:
+    "https://www.google.com/maps/dir/?api=1&destination=31+Adetola+Street%2C+Aguda%2C+Surulere%2C+Lagos%2C+Nigeria",
   hours: "Monday – Saturday, 10AM – 5PM (GMT+1)",
   closed: "Closed Sundays",
   email: "hello@femiandifeoma.com",

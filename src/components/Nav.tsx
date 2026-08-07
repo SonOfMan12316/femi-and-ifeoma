@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { navLinks, site } from "@/lib/site";
 
@@ -23,9 +24,9 @@ export function Nav() {
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <a href="/" aria-label={site.fullName}>
+        <Link href="/" aria-label={site.fullName}>
           <Logo width={210} height={60} priority />
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-8 text-[11.5px] font-medium uppercase tracking-[0.09em] lg:flex">

@@ -6,6 +6,66 @@ Format: `## [version or date] — [Phase/description]`
 
 ---
 
+## [2026-08-07] — Gallery Expansion: 20 New Photographs (HEIC → WebP)
+
+**Gallery grows from 9 to 29 images**
+
+- Client supplied 21 iPhone `.HEIC` files. `IMG_6785 (1).HEIC` is byte-identical to `IMG_6785.HEIC` (both 1,704,123 bytes) and was skipped, so 20 unique photographs were added
+- All 20 converted to WebP before entering the repo — HEIC cannot be decoded by Chrome, Firefox or Edge, so it cannot be referenced from a `src` attribute. Pipeline: `sips -s format png` (lossless intermediate) → `cwebp -q 82 -resize 0 1600`. Sources were 1–3MB each; the WebP derivatives are 116–254KB (see DEC-012)
+- The 9 original tiles are untouched. `step()` in the lightbox wraps modulo `images.length`, so keyboard and arrow navigation picked up all 29 with no change
+
+**Fix: converted images shipped rotated 90° counter-clockwise**
+
+- `sips`'s HEIC decode silently drops the EXIF rotation flag, and `sips -g orientation` returns `<nil>` for these files. 19 portrait photographs were therefore emitted as landscape pixel data lying on their side
+- Corrected with `sips -r 90` inserted between the PNG and WebP steps, and the resize axis changed from `-resize 1600 0` (caps width — the *short* edge on a portrait source) to `-resize 0 1600` (caps the long edge)
+- Orientation is now probed with `mdls -name kMDItemOrientation -raw` plus `kMDItemPixelWidth` / `kMDItemPixelHeight`, which reports the display orientation Finder itself uses. It found 19 portrait against one genuine landscape (`IMG_6118`)
+- Verified on disk: all 19 corrected files measure 1200x1600; `IMG_6118` remains 1600x1200
+
+**Aspect-ratio buckets reconciled to the corrected dimensions**
+
+- Tiles crop with `object-cover`, so a portrait photograph typed `landscape` is hard-cropped rather than distorted. The initial 7 landscape / 6 portrait / 7 square distribution was assigned from the rotated dimensions and would have cropped almost every new tile
+- Redistributed to 8 `tall` / 6 `portrait` / 5 `square` / 1 `landscape`. The corrected files are exactly 3:4, so `tall` is the zero-crop bucket; `landscape` (4/3) is now reserved solely for `IMG_6118`
+- Heights still vary across the three columns, so the masonry packs without gaps per DEC-011
+
+**Known compromises**
+
+- Alt text is truthful café-context description rather than per-photograph detail. Worth a pass with the photographs open
+- The original `.HEIC` files (~30MB) remain in `public/uploads/` and would deploy as dead weight. They should be moved outside the served directory
+
+Verified: `npm run lint` → 0 errors, 5 warnings (baseline match). `npm run build` → TypeScript passes, 8/8 static pages generated.
+
+---
+
+## [2026-08-07] — Phase 3: Moments Gallery + Hero Simplification
+
+**New: `MomentsGallery` replaces the "Our Cats" section on the homepage**
+
+- Photography-led section titled "Moments at the Café" — tells the café's story rather than profiling individual cats
+- Responsive CSS multi-column masonry (1 / 2 / 3 columns) with `break-inside-avoid`; tiles flow down each column so varied heights pack without gaps (see DEC-011)
+- Nine images across four aspect ratios (`3/4`, `4/5`, `1/1`, `4/3`) so column heights vary organically
+- 24px radii, `--shadow-md` resting → `--shadow-lift` on hover, `-translate-y-1` lift, `scale-[1.04]` image zoom
+- Staggered scroll reveal via `Reveal` (`delayMs` keyed to column index)
+- All tiles lazy-loaded through `FadeImage`
+- Lightbox: `role="dialog"` + `aria-modal`, Escape / ← / → keyboard nav, body scroll-lock with previous-overflow restore, image counter. No glassmorphism on the controls (DEC-003)
+
+**Hero simplified**
+
+- Removed both hero CTAs ("Meet the Cats", "Our Story") — "Book a Visit" already lives in the navbar and was not duplicated
+- Removed the hero body copy ("Where coffee, cats and calm come together." / "Escape the noise…")
+- Moved the paw icon, "Where every moment purrs." and "Relax, Purr & Community 😻" into the hero's left column, in the slot the body copy vacated. The standalone white tagline section below the hero was deleted
+- The tagline is now the hero's primary heading, so it was promoted `<h2>` → `<h1>` (verified: no other `<h1>` on the homepage). Left-aligned on cream — the old section's `text-center` and `bg-white` were dropped
+- Tagline set in `--font-display` (Let's Coogi) at 30/34px weight 400 so the script face reads cleanly. Subtext stays on `--font-body` for legibility at 15px
+- Hero now carries wordmark, tagline, three info cards (hours / location / session), lifestyle photo, and the bottom wave only
+
+**Fixes**
+
+- `Nav.tsx` logo now uses `next/link` instead of a bare `<a href="/">`, clearing the `@next/next/no-html-link-for-pages` lint error
+- Added the missing `--shadow-sm` / `--shadow-md` / `--shadow-lg` tokens (documented but absent from `globals.css`) plus `--shadow-lift`
+
+Verified: `npm run lint` → 0 errors, 5 warnings (all pre-existing or intentional `<img>` usage). `npm run build` → TypeScript passes, 8/8 static pages generated.
+
+---
+
 ## [2026-08-04] — Phase 1: Typography System Complete
 
 - Installed Cormorant Garamond via `next/font/google` (self-hosted at build time)

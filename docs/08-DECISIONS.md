@@ -110,4 +110,34 @@ Impact: The site is intentionally off-brand typographically until the font files
 
 ---
 
+### DEC-010 — Section Labels Use 0.22em Tracking
+Date: 2026-08-06
+Status: Accepted
+Decision: The small uppercase eyebrow label above each section heading uses `--tracking-label: 0.22em`, exposed as a token in `globals.css`.
+Rationale: The value was already established by the sections built in Phase 2 and was being repeated as a magic number in each component. Promoting it to a token keeps every eyebrow optically identical and makes a future adjustment one line. Recorded retroactively — `globals.css` referenced this decision number before the entry existed.
+Alternatives considered: Leaving the value inline per component (drifts over time), or folding it into Tailwind's `tracking-widest` (0.1em — visibly too tight for 11px uppercase text).
+Impact: Section eyebrows reference `--tracking-label`. Existing components using a literal `0.22em` are correct but should migrate to the token when touched.
+
+---
+
+### DEC-011 — Gallery Uses CSS Multi-Column Masonry, Not Grid Spans
+Date: 2026-08-07
+Status: Accepted
+Decision: `MomentsGallery` lays out with CSS multi-column (`columns-1 sm:columns-2 lg:columns-3` plus `break-inside-avoid`) rather than CSS Grid with row spans.
+Rationale: The brief required varied image heights that fill space with no awkward gaps. Grid with `grid-auto-flow: dense` and per-tile row spans was tried first and left visible holes wherever a tall tile could not be back-filled — grid rows are shared across columns, so one tall tile pushes its whole row. Multi-column flows tiles independently down each column, so heights pack naturally. True CSS `grid-template-rows: masonry` is not yet broadly supported, and a JS masonry library would add a dependency and a layout-shift-on-load problem for a purely presentational need.
+Alternatives considered: CSS Grid with dense auto-flow and row spans (rejected — gaps). A JS masonry library such as Masonry or react-masonry-css (rejected — dependency weight, reflow after images load). A fixed uniform grid (rejected — the brief explicitly wants organic, varied sizing).
+Impact: Tiles must set their aspect ratio individually and carry `break-inside-avoid`. Reading order runs down each column rather than across rows, which is acceptable for a gallery where no tile depends on its neighbour. Column count changes at the `sm` and `lg` breakpoints only.
+
+---
+
+### DEC-012 — Gallery Photography Converted HEIC → WebP, with `mdls` as the Orientation Probe
+Date: 2026-08-07
+Status: Accepted
+Decision: iPhone HEIC photography is converted to WebP before it enters the repo, via `sips -s format png` (lossless intermediate) → `sips -r 90` where rotation is required → `cwebp -q 82 -resize 0 1600`. The true display orientation of a source file is read with `mdls -name kMDItemOrientation -raw` plus `kMDItemPixelWidth` / `kMDItemPixelHeight`, never with `sips -g orientation`.
+Rationale: HEIC has no browser support outside Safari — Chrome, Firefox and Edge cannot decode it, so a HEIC file cannot be referenced from a `src` attribute at all. Sources were also 1–3MB each; WebP at q82 brings them to 116–254KB. The orientation rule was learned the hard way: `sips -g orientation` returns `<nil>` for these files and `sips`'s HEIC decode silently drops the EXIF rotation flag, so 19 portrait photos were emitted as landscape pixel data rotated 90° counter-clockwise and shipped to the gallery on their side. `mdls` reads the display orientation Finder itself uses and correctly reported 19 portrait (`orient=1`) against one genuine landscape (`orient=0`, `IMG_6118`). The resize axis matters for the same reason: `-resize 1600 0` caps width, which for a portrait source caps the *short* edge; `-resize 0 1600` caps the long edge.
+Alternatives considered: Referencing HEIC directly (rejected — unsupported in every browser but Safari). Converting to JPEG (rejected — larger at equal quality, and a JPEG intermediate would have made the pipeline double-lossy). ImageMagick or sharp (neither installed on this machine). Trusting `sips -g orientation` (rejected — demonstrably returns `<nil>` and produced the rotation bug).
+Impact: Only WebP derivatives are referenced from components. Aspect-ratio buckets in `MomentsGallery` must be assigned from the *corrected* dimensions — tiles crop with `object-cover`, so a portrait image typed `landscape` is hard-cropped rather than distorted. The 19 corrected files are 1200x1600 (exactly 3:4, so `tall` is the zero-crop bucket); `IMG_6118` is 1600x1200. The original `.HEIC` files remain in `public/uploads/` (~30MB) and should be moved out of the deployed directory.
+
+---
+
 _Add new decisions below as they are made during implementation._

@@ -24,7 +24,7 @@
 - ✅ Navbar: increase logo size to 140px wide
 - ✅ Navbar: remove orange block hover on links (colour-only transition)
 - ✅ Navbar: solid cream background (glassmorphism/blur removed)
-- ✅ Navbar: pill CTA button (Book a Visit) — desktop right, mobile drawer bottom
+- ⬜ Navbar: pill CTA button (Book a Visit) — desktop right, mobile drawer bottom (added 2026-08-04, since removed from `Nav.tsx` — reinstate or retire)
 - ✅ Navbar: mobile drawer menu (exists, colours corrected)
 - ✅ Footer: dark (#0C0C0C) background
 - ✅ Footer: white logo (160px, brightness-0 invert)
@@ -49,11 +49,11 @@
 
 ### Home Page
 - ✅ Hero: glassmorphism cards removed
-- ✅ Hero: on-brand headline ("Relax, Purr & Community")
+- ✅ Hero: on-brand headline — now "Where every moment purrs" in `--font-display` (Let's Coogi)
 - ✅ Hero: brand photography (existing photo kept)
-- ✅ Hero: primary + ghost CTA buttons
+- ✅ Hero: CTAs removed — "Book a Visit" lives in the navbar and was not duplicated
 - ⬜ Brand story section
-- ⬜ Meet our Cats section
+- ✅ Moments at the Café gallery — supersedes "Meet our Cats" on the homepage (29 images, masonry + lightbox)
 - ⬜ How it works / Booking preview
 - ⬜ Testimonials section
 
@@ -133,3 +133,10 @@
 | Let's Coogi font installed | 2026-08-06 | Self-hosted TTF (400), `--font-display` wired |
 | Neue Haas Grotesk Display Pro installed | 2026-08-06 | Self-hosted TTF — Light 300, Roman 400, Medium 500, Bold 700. `--font-body` / `--font-sans` wired |
 | Knicknack font installed | 2026-08-06 | Self-hosted WOFF2 — Regular 400, Bold 700. `--font-playful` wired |
+| Moments at the Café gallery | 2026-08-07 | Replaced "Our Cats" on the homepage. Multi-column masonry + lightbox (DEC-011) |
+| Hero simplified | 2026-08-07 | Both CTAs and body copy removed; tagline moved in and promoted to `<h1>` on `--font-display` |
+| Gallery expansion — 20 photographs | 2026-08-07 | 21 HEIC supplied, one byte-identical duplicate skipped. Gallery 9 → 29 images |
+| HEIC → WebP conversion pipeline | 2026-08-07 | `sips` PNG intermediate → `cwebp -q 82`. 1–3MB sources → 116–254KB (DEC-012) |
+| Fix: converted images rotated 90° | 2026-08-07 | 19 portrait files re-run with `sips -r 90`; orientation now probed with `mdls`, not `sips -g` |
+| Gallery aspect-ratio buckets reconciled | 2026-08-07 | 8 tall / 6 portrait / 5 square / 1 landscape, assigned from corrected 1200x1600 dimensions |
+| Fix: five gallery tiles mis-cropped by `object-cover` | 2026-08-07 | Measured all 29 sources with PIL. Re-bucketed `WhatsApp…18.47.50.jpeg` and `IMG_5550.jpg` (landscape → tall), `about-photo.webp` (portrait → landscape), `IMG_5561.jpg` (square → tall), `E89AFD51…2.jpg` (tall → landscape). No image files touched — nothing was rotated |

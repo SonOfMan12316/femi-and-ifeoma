@@ -1,5 +1,5 @@
 import { Logo } from "@/components/Logo";
-import { navLinks, site } from "@/lib/site";
+import { site } from "@/lib/site";
 
 /* All social icons share one 18×18 box so sizing stays consistent. */
 
@@ -45,7 +45,7 @@ const socials = [
   },
   {
     label: "Find us on Google Maps",
-    href: "https://maps.google.com/?q=Fémi+and+Ifeoma+Cat+Café+Surulere+Lagos",
+    href: site.mapsUrl,
     external: true,
     icon: <IconMap />,
   },
@@ -65,35 +65,28 @@ const link =
 export function Footer() {
   return (
     <footer className="bg-black">
-      <div className="mx-auto max-w-3xl px-6 py-24 text-center md:py-28">
-
-        {/* ── Café name ── */}
-        <Logo width={200} height={64} className="brightness-0 invert" />
-        <p className="mt-6 text-[11px] font-medium uppercase tracking-[var(--tracking-label)] text-orange">
-          Relax, Purr &amp; Community
-        </p>
-
-        {/* ── Navigation ── */}
-        <nav aria-label="Footer" className="mt-14">
-          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            {navLinks.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  className="text-[11px] font-medium uppercase tracking-[0.09em] text-white/40 transition-colors duration-[250ms] ease-out hover:text-orange"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className="mx-auto max-w-3xl p-6 text-center">
 
         {/* ── Address · Hours · Contact ── */}
-        <div className="mt-16 grid gap-12 sm:grid-cols-3 sm:gap-8">
+        <div className="grid gap-12 sm:grid-cols-3 sm:gap-8">
           <div>
             <h3 className={label}>Address</h3>
-            <p className={`mt-4 ${value}`}>{site.location}</p>
+            <p className={`mt-4 ${value}`}>
+              {site.address}
+              <br />
+              {site.addressCity}
+            </p>
+            <p className="mt-3">
+              <a
+                href={site.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[13px] font-light text-white/60 transition-colors duration-[250ms] ease-out hover:text-orange"
+              >
+                <IconMap />
+                Find us on Maps
+              </a>
+            </p>
           </div>
 
           <div>
@@ -122,7 +115,7 @@ export function Footer() {
         </div>
 
         {/* ── Social ── */}
-        <ul className="mt-16 flex items-center justify-center gap-8">
+        <ul className="mt-4 flex items-center justify-center gap-8">
           {socials.map((social) => (
             <li key={social.label}>
               <a
@@ -140,12 +133,9 @@ export function Footer() {
         </ul>
 
         {/* ── Copyright ── */}
-        <div className="mt-20 border-t border-white/[0.08] pt-10">
+        <div className="mt-4 border-t border-white/[0.08] pt-10">
           <p className="text-[12px] font-light text-white/30">
             © 2026 {site.fullName}
-          </p>
-          <p className="mt-1.5 text-[12px] font-light text-white/20">
-            Designed with care in Lagos, Nigeria
           </p>
         </div>
 

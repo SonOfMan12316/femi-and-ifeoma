@@ -3,6 +3,7 @@ import { ContentBlock } from "@/components/ContentBlock";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { HouseRules } from "@/components/HouseRules";
+import { MomentsGallery } from "@/components/MomentsGallery";
 import { Nav } from "@/components/Nav";
 import { site } from "@/lib/site";
 
@@ -12,7 +13,8 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
-<ContentBlock
+        <MomentsGallery />
+        <ContentBlock
           eyebrow="Curious?"
           title="What in the world is a cat café?"
           body="Can I live here? Can I quit my job and work for you? How do you deal with all this cuteness in one place? Click below for answers to life's most pressing questions."
