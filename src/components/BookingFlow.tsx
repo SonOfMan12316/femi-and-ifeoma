@@ -2,11 +2,11 @@
 
 import Script from "next/script";
 import { useState } from "react";
-import { site } from "@/lib/site";
+import { site, plans, type Plan } from "@/lib/site";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Step = "select" | "datetime" | "info" | "confirmed";
+type Step = "plan" | "datetime" | "info" | "confirmed";
 
 type Info = {
   firstName: string;
@@ -17,14 +17,6 @@ type Info = {
 };
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-
-const SESSION = {
-  title: "60-Minute Visit in Our Cat Lounge",
-  duration: "60 minutes",
-  price: site.price,
-  description:
-    "PER PERSON: One full hour in our lounge with resident cats: British Shorthairs, Maine Coons, Persians, and more. Includes a complimentary drink on arrival and workstation access. Visitors under 12 must be accompanied by an adult.",
-};
 
 const TIME_SLOTS = [
   "10:00 AM", "11:00 AM", "12:00 PM",
@@ -139,7 +131,8 @@ function Calendar({
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export function BookingFlow() {
-  const [step, setStep] = useState<Step>("select");
+  const [step, setStep] = useState<Step>("plan");
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [qty, setQty] = useState(1);
   const [selectedDate, setSelectedDate] = useState<{
     year: number; month: number; day: number;
@@ -149,31 +142,66 @@ export function BookingFlow() {
     firstName: "", lastName: "", email: "", phone: "", agreed: false,
   });
 
-  // ── Step: select ────────────────────────────────────────────────────────
+  // ── Step: plan ──────────────────────────────────────────────────────────
 
-  if (step === "select") {
+  if (step === "plan") {
     return (
-      <div className="border border-[var(--ink-line)] bg-sand px-8 py-8">
-        <div className="flex items-start justify-between gap-6">
-          <div className="flex-1">
-            <h2 className="text-[20px] font-semibold text-brick">{SESSION.title}</h2>
-            <p className="mt-1 text-[14px] text-[var(--ink-muted)]">
-              {SESSION.duration} @ {SESSION.price}
-            </p>
-            <p className="mt-4 text-[15px] font-light leading-relaxed text-[var(--ink-muted)]">
-              {SESSION.description}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setStep("datetime")}
-            className="shrink-0 rounded-lg bg-brick px-6 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange"
-          >
-            Book
-          </button>
-        </div>
+      <div className="flex flex-col gap-4">
+        {plans.map((plan) => {
+          const selected = selectedPlan?.id === plan.id;
+          return (
+            <button
+              key={plan.id}
+              type="button"
+              onClick={() => {
+                setSelectedPlan(plan);
+                setQty(1);
+              }}
+              className={`w-full border px-8 py-6 text-left transition-colors ${
+                selected ? "border-brick bg-sand" : "border-[var(--ink-line)] bg-sand hover:border-brick"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-6">
+                <div className="flex-1">
+                  <h2 className="text-[18px] font-semibold text-brick">{plan.name}</h2>
+                  <p className="mt-1 text-[13px] text-[var(--ink-muted)]">
+                    {plan.durationMins} minutes @ ₦{plan.price.toLocaleString("en-NG")}
+                    {plan.perPerson ? " per person" : ""}
+                    {plan.schedule ? ` · ${plan.schedule}` : ""}
+                  </p>
+                  <p className="mt-3 text-[14px] font-light leading-relaxed text-[var(--ink-muted)]">
+                    {plan.description}
+                  </p>
+                </div>
+                <span
+                  className={`mt-1 shrink-0 rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.08em] ${
+                    selected ? "border-brick bg-brick text-white" : "border-[var(--ink-line)] text-[var(--ink-muted)]"
+                  }`}
+                >
+                  {selected ? "Selected" : "Select"}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+
+        <button
+          type="button"
+          disabled={!selectedPlan}
+          onClick={() => setStep("datetime")}
+          className="mt-2 self-end rounded-lg bg-brick px-8 py-3 text-[12px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Continue
+        </button>
       </div>
     );
+  }
+
+  if (!selectedPlan) {
+    // Guard: steps below require a plan. Should be unreachable since "datetime"
+    // can only be reached via the plan step's Continue button.
+    setStep("plan");
+    return null;
   }
 
   // ── Step: datetime ──────────────────────────────────────────────────────
@@ -181,13 +209,20 @@ export function BookingFlow() {
   if (step === "datetime") {
     return (
       <div className="flex flex-col gap-6">
-        {/* Selected session summary */}
+        {/* Selected plan summary */}
         <div className="border border-[var(--ink-line)] bg-sand px-8 py-6">
+          <button
+            type="button"
+            onClick={() => setStep("plan")}
+            className="mb-4 flex items-center gap-2 text-[12px] uppercase tracking-wide text-[var(--ink-muted)] hover:text-brick"
+          >
+            ‹ Back
+          </button>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[13px] font-medium text-brick">{SESSION.title}</p>
+              <p className="text-[13px] font-medium text-brick">{selectedPlan.name}</p>
               <p className="mt-0.5 text-[13px] text-[var(--ink-muted)]">
-                {SESSION.duration} @ {SESSION.price}
+                {selectedPlan.durationMins} minutes @ ₦{selectedPlan.price.toLocaleString("en-NG")}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -267,6 +302,8 @@ export function BookingFlow() {
   // ── Step: info ──────────────────────────────────────────────────────────
 
   if (step === "info") {
+    const plan = selectedPlan;
+
     function handlePay(e: React.FormEvent) {
       e.preventDefault();
       if (!info.agreed) return;
@@ -274,13 +311,13 @@ export function BookingFlow() {
       const handler = (window as Window & { PaystackPop?: { setup: (config: Record<string, unknown>) => { openIframe: () => void } } }).PaystackPop?.setup({
         key: site.paystackPublicKey,
         email: info.email,
-        amount: site.priceKobo * qty,
+        amount: plan.price * 100 * qty,
         currency: "NGN",
         ref: `FI-${Date.now()}`,
         metadata: {
           custom_fields: [
             { display_name: "Name", variable_name: "name", value: `${info.firstName} ${info.lastName}` },
-            { display_name: "Session", variable_name: "session", value: SESSION.title },
+            { display_name: "Plan", variable_name: "plan", value: plan.name },
             { display_name: "Date", variable_name: "date", value: selectedDate ? formatDate(selectedDate.year, selectedDate.month, selectedDate.day) : "" },
             { display_name: "Time", variable_name: "time", value: selectedTime ?? "" },
             { display_name: "Quantity", variable_name: "qty", value: String(qty) },
@@ -305,9 +342,9 @@ export function BookingFlow() {
           >
             ‹ Back
           </button>
-          <p className="text-[13px] font-medium text-brick">{SESSION.title}</p>
+          <p className="text-[13px] font-medium text-brick">{selectedPlan.name}</p>
           <p className="mt-0.5 text-[13px] text-[var(--ink-muted)]">
-            {SESSION.duration} @ {SESSION.price} &middot; Qty: {qty}
+            {selectedPlan.durationMins} minutes @ ₦{selectedPlan.price.toLocaleString("en-NG")} &middot; Qty: {qty}
           </p>
           {selectedDate && (
             <p className="mt-0.5 text-[13px] text-[var(--ink-muted)]">
@@ -362,8 +399,8 @@ export function BookingFlow() {
 
           <div className="mt-8 flex items-center justify-between border-t border-[var(--ink-line)] pt-6">
             <p className="text-[15px] font-medium text-brick">
-              Total: {site.price} &times; {qty} ={" "}
-              ₦{(30000 * qty).toLocaleString("en-NG")}
+              Total: ₦{selectedPlan.price.toLocaleString("en-NG")} &times; {qty} ={" "}
+              ₦{(selectedPlan.price * qty).toLocaleString("en-NG")}
             </p>
             <button
               type="submit"
@@ -393,7 +430,8 @@ export function BookingFlow() {
       <button
         type="button"
         onClick={() => {
-          setStep("select");
+          setStep("plan");
+          setSelectedPlan(null);
           setSelectedDate(null);
           setSelectedTime(null);
           setQty(1);
