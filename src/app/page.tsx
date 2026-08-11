@@ -5,7 +5,7 @@ import { Hero } from "@/components/Hero";
 import { HouseRules } from "@/components/HouseRules";
 import { MomentsGallery } from "@/components/MomentsGallery";
 import { Nav } from "@/components/Nav";
-import { site } from "@/lib/site";
+import { plansFromPrice } from "@/lib/site";
 
 export default function Home() {
   return (
@@ -30,7 +30,7 @@ export default function Home() {
           reverse
           eyebrow="Visit us"
           title="Ready for a slow hour in Lagos?"
-          body={`Sessions are ${site.price} per person for a full hour with the cats, the lounge, and a complimentary drink. Reservations required. Walk-ins only if space opens up.`}
+          body={`Plans start at ₦${plansFromPrice.toLocaleString("en-NG")} per person, from a quick PlayDate to group passes with drinks and treats. Reservations required. Walk-ins only if space opens up.`}
           ctaLabel="Book Your Visit"
           ctaHref="/book-your-visit"
           image={{

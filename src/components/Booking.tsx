@@ -1,5 +1,5 @@
 import { Reveal } from "@/components/Reveal";
-import { site } from "@/lib/site";
+import { site, plans, plansFromPrice } from "@/lib/site";
 
 export function Booking() {
   return (
@@ -17,15 +17,23 @@ export function Booking() {
               ★ Reservations are required ★
             </p>
             <div className="mt-6 font-display text-[clamp(3.5rem,10vw,6rem)] italic leading-none text-orange">
-              {site.price}
+              From ₦{plansFromPrice.toLocaleString("en-NG")}
             </div>
             <p className="mt-3 text-[16px] font-light text-white/65">
-              per person · {site.sessionLength}
+              per person · {plans.length} plans, solo to group
             </p>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {plans.map((plan) => (
+                <li
+                  key={plan.id}
+                  className="rounded-full border border-white/25 px-4 py-1.5 text-[12px] font-light text-white/85"
+                >
+                  {plan.name}
+                </li>
+              ))}
+            </ul>
             <a
-              href={site.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/book-your-visit"
               className="mt-10 inline-block rounded-lg bg-brick px-9 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange"
             >
               Book Your Visit

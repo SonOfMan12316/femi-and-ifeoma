@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { BookingFlow } from "@/components/BookingFlow";
 import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
-import { site } from "@/lib/site";
+import { site, plansFromPrice } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: `Book Your Visit · ${site.fullName}`,
-  description: `Reserve your spot at ${site.fullName}. ${site.price} per person for a ${site.sessionLength} with the cats, the lounge, and a complimentary drink.`,
+  description: `Reserve your spot at ${site.fullName}. Plans start at ₦${plansFromPrice.toLocaleString("en-NG")} per person, with the cats, the lounge, and a complimentary drink.`,
 };
 
 export default function BookYourVisitPage() {
