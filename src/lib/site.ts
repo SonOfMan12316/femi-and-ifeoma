@@ -22,6 +22,73 @@ export const site = {
   priceKobo: 3000000, // ₦30,000 in kobo
 } as const;
 
+export type Plan = {
+  id: string;
+  name: string;
+  durationMins: number;
+  price: number; // NGN
+  perPerson: boolean;
+  guestCount?: number; // for fixed-guest passes like Duo
+  description: string;
+  schedule?: string; // e.g. "Every Wednesday" for recurring, non-daily plans
+};
+
+// Sourced from the Kindly booking page (app.kindlybook.com/book-business/femiandifeoma).
+// Standing plans only — excludes the time-boxed "Sip & Paint" International Cat Day event passes.
+export const plans: Plan[] = [
+  {
+    id: "playdate",
+    name: "PlayDate",
+    durationMins: 90,
+    price: 10000,
+    perPerson: true,
+    description: "Cat play date. A relaxed 90 minutes with the cats.",
+    schedule: "Every Wednesday",
+  },
+  {
+    id: "solo-pass",
+    name: "Solo Pass",
+    durationMins: 60,
+    price: 30000,
+    perPerson: true,
+    description:
+      "1 chilled beverage (Nescafé cold coffee or Lipton iced tea), 1 treat (banana bread or cake parfait), 1 cat treat pack, free high-speed Wi-Fi.",
+  },
+  {
+    id: "duo-pass",
+    name: "Duo Pass",
+    durationMins: 60,
+    price: 58000,
+    perPerson: true,
+    guestCount: 2,
+    description:
+      "2 guests · 2 chilled beverages, 1 shared dessert combo (banana bread + cake parfait), 2 cat treat packs.",
+  },
+  {
+    id: "trio-pass",
+    name: "Trio Pass",
+    durationMins: 60,
+    price: 85000,
+    perPerson: true,
+    guestCount: 3,
+    description:
+      "3 chilled beverages, 1 shared dessert board (2 banana breads + 1 parfait), 3 cat treat packs.",
+  },
+  {
+    id: "vip-group-pass",
+    name: "VIP Group Pass",
+    durationMins: 60,
+    price: 140000,
+    perPerson: true,
+    guestCount: 5,
+    description:
+      "5 chilled beverages, 2 shared dessert platters (mix of banana breads & parfaits), 5 cat treat packs.",
+  },
+];
+
+// Lowest per-person plan price, for "from ₦X" teasers.
+export const plansFromPrice = Math.min(...plans.map((p) => p.price));
+
 export type Cat = {
   id: string;
   name: string;
@@ -88,7 +155,7 @@ export const faqs = [
   },
   {
     question: "How long is a visit?",
-    answer: `Each booking is a ${site.sessionLength} for ${site.price} per person, with full lounge access and a complimentary drink on arrival.`,
+    answer: `Plans run from ${plans.length} options, starting at ₦${plansFromPrice.toLocaleString("en-NG")} per person — from a 90-minute PlayDate to group passes with beverages and treats included.`,
   },
   {
     question: "Can children visit?",
