@@ -6,6 +6,34 @@ Format: `## [version or date] — [Phase/description]`
 
 ---
 
+## [2026-08-11] — Phase 4 kickoff: Real Plans Wired into Booking Flow
+
+**Five standing plans added, sourced from the Kindly booking page**
+
+- Added a typed `Plan[]` to `site.ts` (`plans`): PlayDate (90 min, ₦10,000pp, every Wednesday), Solo Pass (60 min, ₦30,000pp), Duo Pass (60 min, ₦58,000pp, 2 guests), Trio Pass (60 min, ₦85,000pp, 3 guests), VIP Group Pass (60 min, ₦140,000pp, 5 guests) — copied from `app.kindlybook.com/book-business/femiandifeoma`
+- Deliberately excluded the "Sip & Paint" / "Sip & Paint (Duo Pass)" listings — those are a dated, one-off International Cat Day event (Sat 8 Aug), not a standing plan (see DEC-013)
+- Added `plansFromPrice` (lowest per-person price) for "From ₦X" copy across the site
+
+**`BookingFlow` (on `/book-your-visit`) — new plan-picker step**
+
+- Replaced the old single hardcoded `SESSION` (fixed ₦30,000/60 min) with a new first step listing all five plans as selectable cards
+- Date/time, guest details, and Paystack payment steps now read price and duration from the selected plan instead of a hardcoded constant
+- "Book Another Visit" on the confirmation screen resets back to the plan step, not a stale "select" step
+
+**Homepage `Booking` teaser and copy updated**
+
+- Headline price replaced with "From ₦10,000" plus a row of plan-name chips
+- "Book Your Visit" CTA now points at the internal `/book-your-visit` flow (which has the real plans + Paystack) instead of linking out to Kindly externally (see DEC-013)
+- FAQ answer, hero booking blurb, and `/book-your-visit` page metadata updated from the single fixed price to plan-aware copy
+
+**New doc: booking & membership data model (design only)**
+
+- Added `12-BOOKING_MEMBERSHIP_SCHEMA.md` — Postgres schema for `plans`, `members`, `bookings`, `visits`. A confirmed booking auto-creates/updates a `members` row (matched by email) so guests don't re-register to return or to use the workspace. No backend code yet — tracked as a new Phase 4/6 task.
+
+Verified: `npm run lint` and `npm run build`.
+
+---
+
 ## [2026-08-07] — Gallery Expansion: 20 New Photographs (HEIC → WebP)
 
 **Gallery grows from 9 to 29 images**

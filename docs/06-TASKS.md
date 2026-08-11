@@ -80,13 +80,32 @@
 
 ## Phase 4 — Booking Flow
 
-- ⬜ Date picker (brand colours)
-- ⬜ Time slot selection (pill buttons)
-- ⬜ Booking form
-- ⬜ Confirmation / success page
-- ⬜ Payment integration styled
+- ✅ Date picker (brand colours) — exists in `BookingFlow.tsx`, brand-styled
+- ✅ Time slot selection (pill buttons) — exists in `BookingFlow.tsx`
+- ✅ Booking form — exists in `BookingFlow.tsx`
+- ✅ Confirmation / success page — exists in `BookingFlow.tsx`
+- ✅ Payment integration styled — Paystack inline, styled with tokens
+- ✅ Real plans wired in (5 plans from Kindly: PlayDate, Solo/Duo/Trio/VIP Group Pass) — added 2026-08-11 (DEC-013)
+- ⬜ Backend: persist bookings to a real database (currently front-end only — Paystack succeeds but nothing is stored server-side)
+- ⬜ Backend: booking confirmation email (Resend/Nodemailer, per `07-ARCHITECTURE.md`)
+- ⬜ Availability: replace static Mon–Sat/all-time-slots-open logic with real capacity checks
 
-**Phase 4 Gate:** ✅ Booking works end-to-end in staging environment.
+**Phase 4 Gate:** ✅ Booking works end-to-end in staging environment (blocked on backend persistence above).
+
+---
+
+## Phase 6 — Membership & Retention (backend)
+
+Added 2026-08-11 at the owner's request: every booking should auto-create a member so guests don't re-register to return or use the workspace, and so the café can retain guest data for email/campaigns. Schema designed in `12-BOOKING_MEMBERSHIP_SCHEMA.md` — no backend code yet.
+
+- ✅ Design data model doc (`members`, `bookings`, `plans`, `visits` tables) — `12-BOOKING_MEMBERSHIP_SCHEMA.md`
+- ⬜ Confirm open questions with owner (marketing opt-in default, workspace eligibility rules, email-optional guests, cancellation policy)
+- ⬜ Stand up Postgres/Supabase instance
+- ⬜ Implement `POST /api/bookings` to upsert `members` + insert `bookings` on Paystack webhook confirmation
+- ⬜ Staff lookup screen for workspace check-ins (logs a `visits` row against an existing member)
+- ⬜ Email/campaign export query or integration (Resend audience sync)
+
+**Phase 6 Gate:** ✅ A booking creates/updates a member record end-to-end in staging; a returning member can be looked up by email or phone.
 
 ---
 

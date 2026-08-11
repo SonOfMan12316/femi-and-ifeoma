@@ -140,4 +140,14 @@ Impact: Only WebP derivatives are referenced from components. Aspect-ratio bucke
 
 ---
 
+### DEC-013 — Real Plans Replace Single Fixed Price; Internal Booking Flow Is the Primary CTA
+Date: 2026-08-11
+Status: Accepted
+Decision: The site's booking surfaces (`Booking.tsx` homepage teaser and `/book-your-visit`) now use five standing plans copied from the Kindly booking page (PlayDate, Solo Pass, Duo Pass, Trio Pass, VIP Group Pass) instead of one fixed ₦30,000/60-minute price. The "Sip & Paint" event passes on Kindly are excluded — they're a dated, one-off International Cat Day promotion, not a standing plan. The homepage "Book Your Visit" CTA now links to the internal `/book-your-visit` flow (custom calendar + Paystack) instead of out to the external Kindly link.
+Rationale: The owner asked to bring the Kindly plans into the site and "kick off the booking flow" — i.e. build toward the custom Phase 4 flow rather than depending on an external booking tool long-term. Sending the primary CTA to the internal flow (which now has real plans and pricing) rather than an external site keeps the guest on-brand and lets the eventual membership/retention system (see `12-BOOKING_MEMBERSHIP_SCHEMA.md`) capture every booking — an external Kindly booking would not.
+Alternatives considered: Keeping the external Kindly link as the CTA and only listing plan names as reference copy (rejected — defeats the purpose of building an in-house booking + membership system). Including the Sip & Paint passes as standing plans (rejected — they're explicitly dated to one Saturday and would mislead guests booking weeks out).
+Impact: `site.ts` gains a `plans` array and `plansFromPrice`; `site.bookingUrl` is no longer referenced from the homepage CTA (still defined, in case it's needed elsewhere). `BookingFlow.tsx` gains a plan-selection step before date/time. Any future plan changes should be made in `site.ts` until the backend in `12-BOOKING_MEMBERSHIP_SCHEMA.md` exists, at which point `plans` should be fetched from the database instead of hardcoded.
+
+---
+
 _Add new decisions below as they are made during implementation._
