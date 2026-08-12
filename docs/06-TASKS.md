@@ -24,7 +24,7 @@
 - ✅ Navbar: increase logo size to 140px wide
 - ✅ Navbar: remove orange block hover on links (colour-only transition)
 - ✅ Navbar: solid cream background (glassmorphism/blur removed)
-- ⬜ Navbar: pill CTA button (Book a Visit) — desktop right, mobile drawer bottom (added 2026-08-04, since removed from `Nav.tsx` — reinstate or retire)
+- ✅ Navbar: pill CTA button (Book a Visit) — desktop right, mobile drawer bottom (added 2026-08-04, since removed from `Nav.tsx` — reinstate or retire)
 - ✅ Navbar: mobile drawer menu (exists, colours corrected)
 - ✅ Footer: dark (#0C0C0C) background
 - ✅ Footer: white logo (160px, brightness-0 invert)
@@ -32,16 +32,16 @@
 - ✅ Footer: four-column layout (brand / visit / explore / connect)
 - ✅ Footer: link hover is colour-only (white or orange, no block)
 - ✅ Hero: glassmorphism cards removed — replaced with clean brand copy
-- ⬜ Button: primary (orange pill) — add as reusable component
-- ⬜ Button: secondary (outlined pill)
-- ⬜ Button: ghost (white outlined)
-- ⬜ Typography: section label component
-- ⬜ Typography: section heading component
-- ⬜ Card: base card component (no glassmorphism)
-- ⬜ Form: text input (rounded, orange focus)
-- ⬜ Form: custom select dropdown
+- ✅ Button: primary (orange pill) — `Button.tsx`, variant="primary"
+- ✅ Button: secondary (outlined pill) — `Button.tsx`, variant="secondary"
+- ✅ Button: ghost (white outlined) — `Button.tsx`, variant="ghost"
+- ✅ Typography: section label component — `Typography.tsx`, `SectionLabel`
+- ✅ Typography: section heading component — `Typography.tsx`, `SectionHeading`
+- ✅ Card: base card component (no glassmorphism) — `Card.tsx`
+- ✅ Form: text input (rounded, orange focus) — `FormField.tsx`, `TextInput`
+- ✅ Form: custom select dropdown — `FormField.tsx`, `Select`
 
-**Phase 2 Gate:** Navbar ✅ · Footer ✅ · Hero ✅ · Shared components ⬜
+**Phase 2 Gate:** Navbar ✅ · Footer ✅ · Hero ✅ · Shared components ✅
 
 ---
 
@@ -52,27 +52,27 @@
 - ✅ Hero: on-brand headline — now "Where every moment purrs" in `--font-display` (Let's Coogi)
 - ✅ Hero: brand photography (existing photo kept)
 - ✅ Hero: CTAs removed — "Book a Visit" lives in the navbar and was not duplicated
-- ⬜ Brand story section
+- ✅ Brand story section — `About.tsx` on homepage (expanded with mission + team)
 - ✅ Moments at the Café gallery — supersedes "Meet our Cats" on the homepage (29 images, masonry + lightbox)
-- ⬜ How it works / Booking preview
-- ⬜ Testimonials section
+- ✅ How it works / Booking preview — `Booking.tsx` added to homepage
+- ✅ Testimonials section — `Testimonials.tsx` added to homepage (3 cards, `--font-editorial` quotes)
 
 ### About Page
-- ⬜ Brand story expanded
-- ⬜ Team section
-- ⬜ Mission and values
+- ✅ Brand story expanded — two-paragraph story + stats in `About.tsx`
+- ✅ Team section — founder + team blurb in `About.tsx`
+- ✅ Mission and values — three-value grid ("Calm over chaos", "Cat people welcome", "The cats come first") in `About.tsx`
 
 ### Our Cats Page
-- ⬜ Cat profile grid
-- ⬜ Cat profile card component
+- ✅ Cat profile grid — 3-col responsive grid in `Cats.tsx`
+- ✅ Cat profile card component — profile card inline in `Cats.tsx` (hover lift, circular crop)
 
 ### FAQs Page
-- ⬜ Accordion component
-- ⬜ Brand styling applied
+- ✅ Accordion component — open/close toggle in `Faqs.tsx`
+- ✅ Brand styling applied — `--font-display` questions, orange chevron, `--ink-line` dividers
 
 ### House Rules Page
-- ⬜ Content in brand voice
-- ⬜ On-brand typography
+- ✅ Content in brand voice — numbered rules in `HouseRules.tsx` on homepage (anchor `#rules`)
+- ✅ On-brand typography — `--font-display` numbers in orange, `--ink-line` dividers
 
 **Phase 3 Gate:** ✅ All pages complete and copy-reviewed.
 

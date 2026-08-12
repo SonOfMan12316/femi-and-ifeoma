@@ -6,6 +6,27 @@ Format: `## [version or date] — [Phase/description]`
 
 ---
 
+## [2026-08-12] — Phase 2 & 3 complete: Shared components + homepage sections
+
+**Phase 2 — all shared components built**
+
+- `Nav.tsx`: "Book a Visit" pill CTA added — desktop right, mobile drawer bottom (uses `Button` component)
+- `Button.tsx`: all three variants confirmed — primary (orange fill), secondary (outlined orange), ghost (white outlined); pill radius, no box shadows
+- `Typography.tsx`: `DisplayTitle`, `SectionHeading`, `SectionLabel`, `BodyText` confirmed
+- `Card.tsx`: new reusable base card — rounded-3xl, soft shadow, optional top image + label + heading; no glassmorphism
+- `FormField.tsx`: `TextInput` (rounded-xl, orange focus ring) + custom `Select` (animated chevron, outside-click dismiss, orange active state)
+
+**Phase 3 — homepage sections + all pages**
+
+- `Booking.tsx` added to homepage (How it works / Booking preview) — dark-background teaser with plans and CTA
+- `Testimonials.tsx` created — 3-card grid on cream, Cormorant Garamond blockquotes, avatar initials
+- `About.tsx` expanded — brand story paragraphs, stats grid, mission & values (3-col), founder/team blurb
+- Our Cats page, FAQs page confirmed complete; HouseRules and About are homepage anchor sections (`#about`, `#rules`) per nav
+
+Verified: `npm run build` clean (0 errors).
+
+---
+
 ## [2026-08-11] — Phase 4 kickoff: Real Plans Wired into Booking Flow
 
 **Five standing plans added, sourced from the Kindly booking page**
