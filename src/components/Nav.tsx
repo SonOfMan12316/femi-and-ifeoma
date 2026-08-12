@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { Button } from "@/components/Button";
 import { navLinks, site } from "@/lib/site";
 
 export function Nav() {
@@ -42,29 +41,23 @@ export function Nav() {
           ))}
         </div>
 
-        {/* Desktop CTA + Mobile hamburger */}
-        <div className="flex items-center gap-3">
-          <Button href="/book-your-visit" className="hidden lg:inline-flex">
-            Book a Visit
-          </Button>
-
-          <button
-            onClick={() => setOpen(!open)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-black transition-colors hover:bg-black/5 lg:hidden"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-          >
-            {open ? (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <svg width="18" height="12" viewBox="0 0 18 12" fill="none" aria-hidden="true">
-                <path d="M0 1H18M0 6H18M0 11H18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              </svg>
-            )}
-          </button>
-        </div>
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-black transition-colors hover:bg-black/5 lg:hidden"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+        >
+          {open ? (
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M1 1L15 15M15 1L1 15" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none" aria-hidden="true">
+              <path d="M0 1H18M0 6H18M0 11H18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            </svg>
+          )}
+        </button>
       </nav>
 
       {/* Mobile menu */}
@@ -81,11 +74,6 @@ export function Nav() {
                 {link.label}
               </a>
             ))}
-          </div>
-          <div className="mt-8 border-t border-[var(--ink-line)] pt-6">
-            <Button href="/book-your-visit" className="w-full justify-center" onClick={() => setOpen(false)}>
-              Book a Visit
-            </Button>
           </div>
         </div>
       ) : null}

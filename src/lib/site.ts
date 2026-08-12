@@ -1,7 +1,7 @@
 export const site = {
   name: "Fémi & Ifeoma",
   fullName: "Fémi & Ifeoma Cat Café",
-  tagline: "First Cat Café in Nigeria",
+  tagline: "Lagos's First Cat Café",
   bookingUrl: "https://kindlybook.me/femiandifeoma",
   price: "₦30,000",
   sessionLength: "60-minute session",
@@ -186,9 +186,9 @@ export const houseRules = [
 
 export const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/book-your-visit", label: "Book Your Visit" },
   { href: "/our-cats", label: "Our Cats" },
   { href: "/#about", label: "About Us" },
   { href: "/faqs", label: "FAQs" },
   { href: "/#rules", label: "House Rules" },
-  { href: "/book-your-visit", label: "Book Your Visit" },
 ] as const;

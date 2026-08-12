@@ -41,7 +41,7 @@ export function About() {
         <div className="grid gap-10 md:grid-cols-2 md:gap-20">
           <Reveal>
             <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.02em] text-brick">
-              Nigeria&apos;s first cat café, built for slow afternoons.
+              Lagos&apos;s first cat café, built for slow afternoons.
             </h2>
           </Reveal>
 

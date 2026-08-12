@@ -1,12 +1,10 @@
 import { About } from "@/components/About";
-import { Booking } from "@/components/Booking";
 import { ContentBlock } from "@/components/ContentBlock";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import { HouseRules } from "@/components/HouseRules";
 import { MomentsGallery } from "@/components/MomentsGallery";
 import { Nav } from "@/components/Nav";
-import { Testimonials } from "@/components/Testimonials";
 import { plansFromPrice } from "@/lib/site";
 
 export default function Home() {
@@ -40,8 +38,6 @@ export default function Home() {
             alt: "Guest spending time with a café cat",
           }}
         />
-        <Booking />
-        <Testimonials />
         <About />
         <HouseRules />
       </main>
