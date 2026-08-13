@@ -27,6 +27,33 @@ Verified: `npm run build` clean (0 errors).
 
 ---
 
+## [2026-08-11] — Repo Split into frontend/ + backend/, NestJS Backend Scaffolded
+
+**Monorepo restructure (DEC-014)**
+
+- Moved the entire existing Next.js app — `src/`, `public/`, `package.json`, `next.config.ts`, `postcss.config.mjs`, `tsconfig.json`, `eslint.config.mjs`, `README.md` — into `frontend/` via `git mv` (renames preserved in git history)
+- Rewrote root `.gitignore` with `**/`-prefixed patterns so one file covers both `frontend/` and `backend/` (node_modules, build output, `.env*`, tsbuildinfo)
+- Verified `frontend/` still builds cleanly from its new location: `npm run lint` → 0 errors, 5 baseline warnings; `npx tsc --noEmit` → clean
+
+**New `backend/` — NestJS + Prisma + Supabase Postgres**
+
+- Framework, database, and repo-wiring options (Express/Fastify, Supabase/Neon, npm workspaces/plain split) were presented with pros/cons; the owner chose NestJS, Supabase, and a plain two-folder split (DEC-014)
+- `prisma/schema.prisma` mirrors `12-BOOKING_MEMBERSHIP_SCHEMA.md`: `Plan`, `Member`, `Booking`, `Visit` models
+- Modules: `plans` (read), `members` (lookup, marketing export, the `upsertOnVisit` method that implements "booking creates membership"), `bookings` (create pending → confirm on payment, which is what actually triggers the member upsert + a `visits` row), `visits` (workspace check-in for an existing member, no new booking required)
+- `prisma/seed.ts` loads the same 5 plans as `frontend/src/lib/site.ts` — the two are manually kept in sync until the frontend fetches from `GET /plans` instead of hardcoding
+- `.env.example` documents `DATABASE_URL` (Supabase), `PAYSTACK_SECRET_KEY`, `PORT`, `CORS_ORIGINS`
+
+**Known gaps (flagged in `backend/README.md` and `06-TASKS.md` Phase 6, not yet built)**
+
+- No Paystack webhook signature verification yet — `POST /bookings/:id/confirm` trusts its payload
+- No auth on `/members/lookup` or `/members/marketing-export`
+- No availability/capacity checking on booking creation
+- Frontend `BookingFlow.tsx` still only talks to Paystack directly — not yet wired to call the new backend
+
+Verified: `npm install` succeeds in `backend/`; `npx nest build` and `npx eslint "src/**/*.ts"` both clean. `npx prisma generate` could **not** be verified in this sandbox — outbound access to `binaries.prisma.sh` (Prisma's engine download host) is blocked here. Run `npm install && npx prisma generate` in a normal environment before first use.
+
+---
+
 ## [2026-08-11] — Phase 4 kickoff: Real Plans Wired into Booking Flow
 
 **Five standing plans added, sourced from the Kindly booking page**

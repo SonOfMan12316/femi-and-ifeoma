@@ -96,14 +96,19 @@
 
 ## Phase 6 — Membership & Retention (backend)
 
-Added 2026-08-11 at the owner's request: every booking should auto-create a member so guests don't re-register to return or use the workspace, and so the café can retain guest data for email/campaigns. Schema designed in `12-BOOKING_MEMBERSHIP_SCHEMA.md` — no backend code yet.
+Added 2026-08-11 at the owner's request: every booking should auto-create a member so guests don't re-register to return or use the workspace, and so the café can retain guest data for email/campaigns. Schema designed in `12-BOOKING_MEMBERSHIP_SCHEMA.md`. Repo split and backend scaffolded 2026-08-11 (DEC-014) — NestJS + Prisma + Supabase Postgres in `backend/`.
 
 - ✅ Design data model doc (`members`, `bookings`, `plans`, `visits` tables) — `12-BOOKING_MEMBERSHIP_SCHEMA.md`
-- ⬜ Confirm open questions with owner (marketing opt-in default, workspace eligibility rules, email-optional guests, cancellation policy)
-- ⬜ Stand up Postgres/Supabase instance
-- ⬜ Implement `POST /api/bookings` to upsert `members` + insert `bookings` on Paystack webhook confirmation
-- ⬜ Staff lookup screen for workspace check-ins (logs a `visits` row against an existing member)
-- ⬜ Email/campaign export query or integration (Resend audience sync)
+- ✅ Split repo into `frontend/` and `backend/` (plain two-folder monorepo, DEC-014)
+- ✅ Scaffold NestJS backend: Prisma schema, `plans`/`members`/`bookings`/`visits` modules, seed script — builds and lints clean
+- ⬜ Confirm open questions with owner (marketing opt-in default, workspace eligibility rules, email-optional guests, cancellation policy) — see `12-BOOKING_MEMBERSHIP_SCHEMA.md`
+- ⬜ Create the actual Supabase project, set `DATABASE_URL` in `backend/.env`, run `prisma migrate` + `prisma:seed`
+- ⬜ Wire `BookingFlow.tsx` on the frontend to call the backend (`POST /bookings` → Paystack → `POST /bookings/:id/confirm`) instead of only calling Paystack directly
+- ⬜ Paystack webhook signature verification (flagged `TODO` in `bookings.controller.ts`)
+- ⬜ Staff lookup screen (UI) for workspace check-ins — the API (`GET /members/lookup`, `POST /visits/check-in`) exists, no frontend for it yet
+- ⬜ Admin auth for `/members/lookup` and `/members/marketing-export` (currently open/unauthenticated)
+- ⬜ Email/campaign export integration (Resend audience sync) — `GET /members/marketing-export` exists as the data source
+- ⬜ Deploy backend (Render free tier or Fly.io) + Supabase, point frontend's `NEXT_PUBLIC_API_URL` at it
 
 **Phase 6 Gate:** ✅ A booking creates/updates a member record end-to-end in staging; a returning member can be looked up by email or phone.
 

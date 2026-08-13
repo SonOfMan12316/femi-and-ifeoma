@@ -150,4 +150,17 @@ Impact: `site.ts` gains a `plans` array and `plansFromPrice`; `site.bookingUrl` 
 
 ---
 
+### DEC-014 — Backend Stack: NestJS + Prisma + Supabase Postgres, Plain Two-Folder Monorepo
+Date: 2026-08-11
+Status: Accepted
+Decision: The repo is split into `frontend/` (existing Next.js app, moved as-is) and `backend/` (new NestJS API), as two fully independent codebases — no npm workspaces, no shared root `package.json`, no shared tooling. The backend uses NestJS as the framework, Prisma as the ORM, and Supabase Postgres as the database.
+Rationale: The owner asked explicitly for (1) the backend to not live inside the Next.js app's folder structure, (2) no MongoDB, (3) something free/low-cost to run and genuinely scalable rather than a quick prototype, and (4) to be presented options with pros/cons rather than have a stack silently chosen. Framework, database, and repo-wiring options were presented; the owner chose NestJS, Supabase, and a plain two-folder split (not npm workspaces) directly.
+Alternatives considered (presented to the owner):
+  - **Framework:** Express (more standard, larger community, more boilerplate for validation) and Fastify (faster, built-in schema validation, smaller community) were offered alongside NestJS. NestJS itself brings structure (modules/DI) similar to what a growing booking + membership system needs, and was the owner's explicit pick over the two presented options.
+  - **Database:** Neon (true scale-to-zero serverless Postgres, no bundled extras) was offered alongside Supabase (500MB/50k MAU free tier, bundled auth + storage for a future admin panel, pauses after 1 week idle). Supabase was chosen for the bundled auth/storage headroom.
+  - **Repo wiring:** npm workspaces (shared root install, shared types package) was offered alongside a plain two-folder split. The owner chose the plain split — simpler mental model, fully independent deploys, at the cost of the `Plan` shape currently being duplicated between `frontend/src/lib/site.ts` and `backend/prisma/seed.ts` until the frontend is wired to fetch from the API.
+Impact: `package.json`, `src/`, `public/`, and all Next.js config moved from repo root into `frontend/`. `.gitignore` rewritten to cover both folders with `**/` patterns. New `backend/` scaffolded: NestJS modules for `plans`, `members`, `bookings`, `visits` implementing the flow in `12-BOOKING_MEMBERSHIP_SCHEMA.md`; Prisma schema mirrors that doc's SQL. Verified: `backend` installs, lints clean, and `nest build` succeeds in this environment. `npx prisma generate` could not be verified here — the sandbox cannot reach `binaries.prisma.sh` to download the query engine — so run `npm install && npx prisma generate` in a normal environment before first use.
+
+---
+
 _Add new decisions below as they are made during implementation._
