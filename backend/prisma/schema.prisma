@@ -1,0 +1,113 @@
+// Prisma schema for the Fémi & Ifeoma Cat Café booking + membership backend.
+// Mirrors the design in /docs/12-BOOKING_MEMBERSHIP_SCHEMA.md — keep the two in sync.
+// Target: Supabase Postgres (DATABASE_URL in .env, see .env.example).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum BookingType {
+  cafe_visit
+  workspace
+  event
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+  no_show
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum VisitType {
+  cafe_visit
+  workspace
+}
+
+model Plan {
+  id            String      @id // e.g. "solo-pass", matches frontend/src/lib/site.ts Plan.id
+  name          String
+  durationMins  Int         @map("duration_mins")
+  priceKobo     Int         @map("price_kobo")
+  perPerson     Boolean     @default(true) @map("per_person")
+  guestCount    Int?        @map("guest_count")
+  description   String
+  schedule      String?
+  bookingType   BookingType @default(cafe_visit) @map("booking_type")
+  active        Boolean     @default(true)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  bookings Booking[]
+
+  @@map("plans")
+}
+
+model Member {
+  id               String    @id @default(uuid())
+  firstName        String    @map("first_name")
+  lastName         String    @map("last_name")
+  email            String    @unique
+  phone            String?
+  marketingOptIn   Boolean   @default(false) @map("marketing_opt_in")
+  totalVisits      Int       @default(0) @map("total_visits")
+  firstVisitAt     DateTime? @map("first_visit_at")
+  lastVisitAt      DateTime? @map("last_visit_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  bookings Booking[]
+  visits   Visit[]
+
+  @@index([phone])
+  @@map("members")
+}
+
+model Booking {
+  id                String        @id @default(uuid())
+  memberId          String        @map("member_id")
+  member            Member        @relation(fields: [memberId], references: [id])
+  planId            String        @map("plan_id")
+  plan              Plan          @relation(fields: [planId], references: [id])
+  bookingDate       DateTime      @map("booking_date") @db.Date
+  timeSlot          String        @map("time_slot")
+  partySize         Int           @default(1) @map("party_size")
+  status            BookingStatus @default(pending)
+  amountKobo        Int           @map("amount_kobo")
+  paymentReference  String?       @unique @map("payment_reference")
+  paymentStatus     PaymentStatus @default(pending) @map("payment_status")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  visits Visit[]
+
+  @@index([memberId])
+  @@index([bookingDate])
+  @@map("bookings")
+}
+
+model Visit {
+  id           String    @id @default(uuid())
+  memberId     String    @map("member_id")
+  member       Member    @relation(fields: [memberId], references: [id])
+  bookingId    String?   @map("booking_id")
+  booking      Booking?  @relation(fields: [bookingId], references: [id])
+  visitType    VisitType @default(cafe_visit) @map("visit_type")
+  checkedInAt  DateTime  @default(now()) @map("checked_in_at")
+
+  @@index([memberId])
+  @@map("visits")
+}
