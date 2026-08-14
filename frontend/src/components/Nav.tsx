@@ -17,10 +17,10 @@ export function Nav() {
 
   return (
     <header
-      className={`sticky top-0 z-50 backdrop-blur-lg transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-cream/95 shadow-[0_1px_12px_rgba(12,12,12,0.08)]"
-          : "bg-cream/95"
+          ? "bg-cream shadow-[0_1px_12px_rgba(12,12,12,0.08)]"
+          : "bg-cream"
       }`}
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
