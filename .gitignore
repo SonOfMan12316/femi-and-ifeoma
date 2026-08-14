@@ -3,6 +3,9 @@
 
 # dependencies
 **/node_modules
+
+# root-level lockfile (causes Next.js workspace root confusion on Vercel)
+/package-lock.json
 **/.pnp
 **/.pnp.*
 .yarn/*
