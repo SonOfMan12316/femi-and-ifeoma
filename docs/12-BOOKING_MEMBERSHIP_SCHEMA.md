@@ -1,7 +1,8 @@
 # Fémi & Ifeoma Cat Café — Booking & Membership Data Model
 
-**Status:** Proposed — design only, no backend code yet.
-**Depends on:** `07-ARCHITECTURE.md` (Backend Stack: Node.js, PostgreSQL/Supabase).
+**Status:** Implemented 2026-09-24. See DEC-016…DEC-019 for the changes made during implementation;
+the SQL below is the original design and is now superseded by `backend/prisma/schema.prisma`.
+**Depends on:** `07-ARCHITECTURE.md` (Backend Stack: Node.js, Postgres on Neon — DEC-015).
 **Feeds into:** Phase 4 — Booking Flow, and a new Phase 6 — Membership & Retention (see `06-TASKS.md`).
 
 ---
@@ -154,3 +155,50 @@ Segments (e.g. "visited once, never came back," "VIP Group Pass regulars") are q
 ## Relationship to `07-ARCHITECTURE.md`
 
 This supersedes the placeholder `Booking.js` / `TimeSlot.js` models listed there with `bookings`, `members`, `plans`, and `visits`. `07-ARCHITECTURE.md` should be updated to reference this file once backend implementation actually begins (tracked as a Phase 4/6 task in `06-TASKS.md`).
+
+---
+
+## Implementation notes (2026-09-24)
+
+The schema above is the original design. `backend/prisma/schema.prisma` is now the
+source of truth; it differs as follows, and each difference has a decision record.
+
+**Capacity — the piece this document didn't cover (DEC-016).** A time slot holds
+**6 guests**, counted as the sum of `party_size`, not the number of bookings. The cap
+is `SLOT_CAPACITY` (default 6). A new `slot_closures` table lets staff close a whole
+day (`time_slot = '*'`) or a single slot. `GET /availability?date=` and
+`GET /availability/month` expose live counts; `GET /admin/bookings?date=` is the staff
+day sheet.
+
+**Seat holds (DEC-017).** `bookings` gains `hold_expires_at`, and `status` gains
+`expired`. A pending booking holds its seats for 10 minutes and counts against
+capacity only while that hold is live. The capacity check and the insert run in one
+Serializable transaction, so two guests racing for the last seat produce one booking
+and one 409.
+
+**Time slots are canonical keys.** `time_slot` stores `'10:00'`…`'16:00'`, not the
+display string `'11:00 AM'` this document originally showed. Display labels live in
+`backend/src/common/schedule.ts` and are sent to the frontend. Changing a label is now
+safe; changing a key would orphan bookings.
+
+**Guest snapshot on the booking (DEC-019).** `bookings.member_id` is **nullable**, and
+`bookings` carries `guest_first_name`, `guest_last_name`, `guest_email`, `guest_phone`
+and `marketing_opt_in`. The membership auto-creation flow described above is otherwise
+unchanged — it just runs strictly on confirmed payment, via one idempotent
+`confirmByReference()` shared by the webhook and the browser-callback path, so a
+replayed webhook cannot double-count `total_visits`.
+
+**Plans: group passes are flat-priced (DEC-018).** Duo/Trio/VIP are `per_person = false`
+— their price is the total for the party, and `party_size` is forced to the plan's
+`guest_count`.
+
+### Open questions — status
+
+1. **Marketing consent** — resolved in code as recommended: `marketing_opt_in` defaults
+   to `FALSE` and is sent as `false` from the booking form. ⬜ Still needs an explicit
+   checkbox in the UI before any marketing send, and owner sign-off.
+2. **Workspace access rules** — ⬜ still open. `visits` has no eligibility check.
+3. **Duplicate guests without email** — email remains `NOT NULL UNIQUE` on `members`,
+   and the booking form requires it. ⬜ Revisit if phone-only guests appear.
+4. **Cancellation/refund policy** — ⬜ still open. `status` now also carries `expired`
+   for abandoned holds, which is distinct from a guest-initiated `cancelled`.

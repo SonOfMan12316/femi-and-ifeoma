@@ -6,6 +6,189 @@ Format: `## [version or date] — [Phase/description]`
 
 ---
 
+## [2026-09-26] — Booking card redesign; nav/footer alignment; Our Cats removed
+
+**Booking card** — the service header and calendar were two separate boxes; they are now one card (white, 16px radius, 1px border, soft shadow).
+- Header: round outline back button, a peach icon tile (laptop for Co-Work, cup for the café pass), plan name, and a friendly duration — **"Full day, 10 hours"** rather than "600 minutes @ ₦6,000". Guests moved into a pill stepper on the right, with min/max enforced by disabled buttons.
+- Body: 57/43 split — calendar left, summary panel right on a grey ground with a left border; stacks to one column under `sm`.
+- Calendar rewritten: month/year sentence case, round nav buttons with **previous disabled on the current month**, `Su Mo Tu…` labels, 40px circular day cells. Unavailable days are struck through rather than merely dimmed; today carries an inset orange ring; selected is solid orange. Every cell is a real `<button>` with a full-date `aria-label` and visible focus ring.
+- Summary panel: empty state pulls opening hours from `site.hours` rather than hardcoding them. Selected state shows the date as "Saturday 26 September", the time window, a price line, and a pill Continue with an arrow.
+- Hourly plans inject their time-slot list into the same panel a day pass uses for its fixed window, so one panel serves both plan shapes.
+- All booking logic, data fetching, state and props unchanged. Dead code removed: the old `Calendar` (98 lines) and its now-orphaned `DAYS` / `MONTHS` / `toDateStr` helpers.
+
+**Nav and footer aligned to the page.** Footer moved from `max-w-3xl` centred to `max-w-6xl px-6` with `justify-between`, matching the nav and the `About`/`ContentBlock` sections.
+
+**Two project-rule violations found and fixed in the footer.** It imported `Logo` but never rendered it, so CLAUDE.md rule 7 ("use the white logo in the footer") had not held for some time — restored at 170px with `brightness-0 invert`. The brand tagline **"Relax, Purr & Community"** was absent from the entire codebase despite rule 7 and an earlier changelog entry claiming it shipped; added to `site.ts` as `brandTagline` (distinct from `tagline`, the positioning line) and rendered in orange beneath the logo.
+
+**Our Cats page removed.** `/our-cats` deleted and dropped from the nav, which is now Home + Book Your Visit. `Cats.tsx` remains in the repo but is now unrendered.
+
+**AGENTS.md** — added a Conventional Commits convention (`type: summary`, no scope, specific summaries, `BREAKING CHANGE:` footer), placed outside the generated `nextjs-agent-rules` markers so a regeneration cannot overwrite it.
+
+Verified: build and lint clean (0 errors), `/` and `/book-your-visit` both 200, booking card renders both plans.
+
+---
+
+## [2026-09-26] — Navigation simplified; FAQs folded into the landing page
+
+The site is essentially a single page with two real sub-pages, so the nav was carrying links that only scrolled you down the page you were already on.
+
+- **Nav trimmed from six links to three** — Home, Book Your Visit, Our Cats. Removed "About Us" (`/#about`), "House Rules" (`/#rules`) and "FAQs". All three are homepage sections a visitor scrolls past anyway. Each section keeps its `id`, so existing deep links still resolve.
+- **FAQs moved onto the landing page**, between House Rules and the footer. `/faqs` deleted — keeping both would have served identical content at two URLs, which search engines treat as duplication.
+- **`ContentBlock`'s CTA is now optional.** The "What in the world is a cat café?" block used to link to `/faqs`; with the answers sitting directly below it on the same page, a button pointing away made no sense, and repointing it at booking would have put two identical CTAs in consecutive blocks. Its closing line changed from "Click below for answers..." to "Scroll on — we answer life's most pressing questions further down," so the copy matches what the page now does.
+
+Verified: build and lint clean, `/` `/book-your-visit` `/our-cats` all 200, `/faqs` correctly 404, and the homepage renders moments → visit → about → rules → faqs → footer.
+
+---
+
+## [2026-09-26] — Full-site motion audit (improve-animations) and fixes
+
+Audited all eight categories across every page. Findings vetted at their `file:line`, planned into `plans/001`–`005`, then executed.
+
+**HIGH — fixed**
+- **`transition: all`** in `Nav.tsx`, `Hero.tsx` (×3) and `ContentBlock.tsx` — transitioned unintended properties off the GPU. Now each names its properties.
+- **Ungated `:hover` transforms** in `Hero.tsx` (×3), `Cats.tsx` (×2), `ContentBlock.tsx` (×2) and `Footer.tsx`. On touch, a tap fires a synthetic hover and the element **stayed lifted after the finger left**. All now route through pointer-gated `.hover-lift` / `.group-zoom` classes.
+- **Reduced motion was zeroing everything** — `.reveal` and `.hero-animate` had `transition: none` / `animation: none`, so content popped in with no bridge at all. The standard is gentler, not zero: both now fade over 200ms with `transform: none`. Movement is what reduced motion asks us to drop, not feedback. The infinite loader sweep and the 28s Ken Burns stay fully disabled — correctly.
+
+**MEDIUM — fixed**
+- **Easing consolidated.** `cubic-bezier(0.22, 1, 0.36, 1)` was hand-typed in 9 places (including an unspaced variant) alongside the new `--ease-out`. Two imperceptibly different curves, neither authoritative. All now `var(--ease-out)`; zero literals remain.
+- **Hover durations** of 700ms (`ContentBlock`) and 420/360ms (`Cats`) brought to 250ms — past ~300ms a hover reads as lag rather than response.
+
+**Reported, not fixed**
+- `Card.tsx` and the `Select` in `FormField.tsx` are **dead components** — nothing imports them. They carry the same `transition: all` and ungated-hover defects, but no user sees them. Worth deleting rather than fixing.
+- `MomentsGallery.tsx` excluded at the owner's request. For the record it still has 500ms hover durations and ungated hover transforms.
+
+Verified: build and lint clean, all four routes 200, and the pointer gates, consolidated tokens and reduced-motion fades confirmed in the CSS actually served.
+
+---
+
+## [2026-09-26] — Motion pass + booking pass-card redesign
+
+Audited with Emil Kowalski's `find-animation-opportunities` skill, which gates every candidate on frequency, purpose, speed and function. Most candidates were rejected; the surviving ones were all the same defect — **state changing with no bridge**.
+
+**Motion tokens** (`globals.css`) — one vocabulary: `--ease-out`, `--ease-in-out`, `--ease-drawer`, plus `--duration-press/collapse/step/drawer`. Durations sit at the unhurried end of each budget to match "calm over chaos"; nothing bounces.
+
+**Implemented**
+- **FAQ accordion** — answers teleported in/out via conditional render. Now `grid-template-rows: 0fr → 1fr` + opacity, 220ms. Always mounted (a transition needs both states); `aria-hidden` when closed. The +/− glyph swap became a single rotating `+`.
+- **Booking step transitions** — the four steps swapped with no bridge. Forward drifts up, Back drifts down, 260ms.
+- **Button press feedback** — `:active` scale(0.97) at 160ms, deliberately near-imperceptible for its frequency tier. Also fixed two standing violations: `transition-all` (now names its properties) and an **ungated `:hover` transform** (touch fired false hovers, leaving buttons stuck hovered).
+- **Mobile nav drawer** — conditional render → collapse at 280ms on the iOS drawer curve, links staggered 30ms behind the panel. `inert` when closed.
+- **House Rules** — whole list arrived at once; items now stagger 60ms via a new `.stagger-child` pattern (wrapping each `<li>` in `Reveal` would have put a `<div>` between `<ol>` and `<li>`).
+
+**Rejected, with reasons** — stat counters (Delight is only permitted at the rare/first-time tier, not an occasional homepage section); route transitions (every approach adds real delay to navigation); nav scroll state and hero (already correct); **the gallery, left untouched at the owner's request** — it already had masonry, a lightbox and a scroll-driven per-tile stagger.
+
+**PassCard** (`components/PassCard.tsx`) — new reusable component for the plan step, built to survive catalogue changes. 22px radius, soft shadow, no hard border; selection is a warm accent ring + tint + a checkmark badge scaling from 0.8 (never 0). Whole card is the control. Price is the heaviest element on the card; Continue uses the shared `Button` primary with a proper disabled state instead of a grey block that read as broken.
+
+**Self-review fixed three of my own defects:** the plan step animated its container *and* staggered its cards, so both competed — the cards now carry the entrance alone; an `inert` type-cast hack was unnecessary on React 19; and Tailwind's arbitrary-variant syntax for compound media queries emitted invalid CSS (`(hover:hover)and(pointer:fine)`), which 500'd every page — replaced with plain `.hover-lift` / `.hover-grow` classes.
+
+**Not built:** no discount/strike-through price. The "strikethrough" reported on the price is the **Naira sign** — `₦` is an N with two strokes through it. There is no discount in the data, and rendering one would display a price that does not exist.
+
+Verified: build and lint clean; all four routes 200; motion tokens, the pointer gate and the reduced-motion variants confirmed present in the served CSS.
+
+---
+
+## [2026-09-26] — Two-plan catalogue, whole-day passes, and the capacity cap removed
+
+**Plans cut to two (DEC-020)**
+- **Solo Pass for the Cat Cafe** ₦30,000 · 60 min · per person
+- **Co-Work Space** ₦6,000 · per person, per day · booked by date with no start time
+- PlayDate, Duo, Trio and VIP Group Pass **deactivated, not deleted** — confirmed bookings reference them by foreign key. Verified: those bookings still resolve their plan names.
+
+**Hours extended to 8 PM (DEC-020)** — hourly sessions now start 10:00 through 19:00 (was 10:00–16:00). Published hours updated in `site.ts`, `Hero.tsx`, `Footer.tsx`.
+
+**Whole-day passes** — `bookingType = "workspace"` drives a separate path. `GET /availability?planId=` returns one all-day entry instead of hourly slots; bookings share an `"all-day"` sentinel in `time_slot`, so co-workers group into one per-day count with no schema change. The booking form skips the time picker and auto-selects the single option.
+
+**Capacity cap removed (DEC-021)** — no more 409 `SLOT_FULL`; the Serializable transaction guarding it is gone with it. Counting is untouched: the staff day sheet still reports confirmed and pending guests per slot. Guests no longer see "4 of 6 left". `capacity`/`remaining` are omitted from responses rather than reported as meaningless numbers.
+
+**Copy** — homepage body, booking-page metadata and the plans FAQ rewritten for the two-plan catalogue.
+
+**Verified against the live database:** four bookings of 5 guests all accepted into a single 11:00 slot (20 total, previously rejected at 6), slot still reports `booked: 20, available: true`; Co-Work day pass books as `all-day` at ₦12,000 for two; both apps build and lint clean.
+
+**Outstanding:** `Testimonials.tsx` quotes a "VIP Group Pass" customer and a "PlayDate regular" — retired plans. Left alone deliberately: these are attributed quotes, not marketing copy, so the owners should decide.
+
+---
+
+## [2026-09-26] — First live payment; three bugs found and fixed
+
+The first real test payment (VIP Group Pass, ₦140,000, Paystack test mode) **succeeded on Paystack but was never recorded**, surfacing three distinct faults.
+
+**1. Paystack Inline takes `ref`, not `reference`** — `BookingFlow.tsx`
+Wiring the server-generated reference introduced `reference:` where the original code had `ref:`. Paystack doesn't error on an unknown key — it silently minted its own reference (`T303564008266689`), so verification looked up a transaction that had never existed. Fixed, with a comment so it isn't reintroduced.
+The callback's own reference is now also sent to `POST /bookings/:id/verify` and treated as the authority, so a dropped reference can no longer strand a real payment.
+
+**2. Any Paystack error was reported as a connectivity failure** — `payments.service.ts`
+`fetchTransaction()` mapped every non-OK response to "Could not reach Paystack", so a 400 *"Transaction reference not found"* read as a network problem and sent the investigation the wrong way. Now: `fetch` throwing is unreachable, 5xx is unavailable-and-retryable, and 4xx surfaces Paystack's actual message.
+
+**3. Neon cold starts failed requests outright** — new `prisma-retry.interceptor.ts`
+Neon suspends an idle compute; the first query after that lost the race and threw `P1001`. This broke availability calls, which is why the calendar rendered with **every date disabled and no explanation**. A global interceptor now retries once on `P1001`/`P1002` only — codes that mean no connection was established, so no write can have landed and a retry cannot duplicate a booking.
+The calendar also no longer fails silently: it shows the error with a "Try again" link, and a "Loading available dates…" line while the month is in flight.
+
+**Reconciliation:** the stranded ₦140,000 booking was recovered through the fixed verify path — now `confirmed/paid` under Paystack's reference, with the member and visit rows created. Re-verifying does not double-count visits.
+
+**Also:** `start:prod` ran `node dist/main` but `nest build` emits `dist/src/main.js` — production start would have failed on deploy. Fixed.
+
+---
+
+## [2026-09-24] — Booking backend: real persistence, per-slot capacity, verified payments
+
+**Database (DEC-015)**
+
+- Postgres host switched from Supabase to Neon. `schema.prisma` unchanged; `.env.example` rewritten with pooled `DATABASE_URL` + `DIRECT_URL`.
+
+**Capacity tracking (DEC-016, DEC-017)**
+
+- `backend/src/common/schedule.ts`: the seven time slots defined once, as canonical 24h keys (`"10:00"`) with separate display labels. Replaces the display strings that were previously written to the database.
+- `backend/src/common/capacity.config.ts`: `SLOT_CAPACITY` (default 6 guests per slot) and `BOOKING_HOLD_MINUTES` (default 10).
+- New `availability` module: `GET /availability?date=`, `GET /availability/month?year=&month=`, `GET /availability/slots`. Live per-slot `booked` / `remaining` / `available`.
+- New `SlotClosure` model — close a whole day (`timeSlot = "*"`) or a single slot.
+- `BookingStatus` gains `expired`; `Booking` gains `hold_expires_at` and a `(booking_date, time_slot)` index.
+- `BookingsService.create()` rewritten: Serializable transaction around the capacity check + insert, one retry on write conflict, 409 `SLOT_FULL` when the slot can't fit the party. Rejects past dates, Sundays, closures, and PlayDate on a non-Wednesday.
+- `POST /bookings/:id/release` frees seats on Paystack `onClose`; a 5-minute interval sweeps abandoned holds.
+
+**Payments (DEC-018)**
+
+- New `payments` module. `POST /payments/paystack/webhook` verifies `x-paystack-signature` (HMAC-SHA512 over the raw body, constant-time compare) — resolves the `TODO` that sat in `bookings.controller.ts`. `main.ts` now bootstraps with `rawBody: true`.
+- `POST /bookings/:id/verify` calls Paystack's verify API server-side for the browser-callback path; idempotent with the webhook.
+- The unauthenticated `POST /bookings/:id/confirm` is removed.
+- **Fixed a live billing bug:** Duo/Trio/VIP Group Passes were `perPerson: true`, so a ₦58,000 Duo Pass booked for 2 charged ₦116,000. Corrected to `perPerson: false` in `site.ts` and `seed.ts`; fixed-size passes now force `partySize` to the plan's `guestCount`.
+- Amounts and references are generated server-side; the browser no longer decides what to charge.
+
+**Membership (DEC-019)**
+
+- Guest details move onto the booking row; `member_id` is nullable. Members are created/updated only on confirmed payment, via one idempotent `confirmByReference()` shared by both confirmation paths.
+
+**Email**
+
+- New `email` module — Resend over plain `fetch`, no SDK dependency. Confirmation to the guest plus a copy to the café. No-ops with a warning when `RESEND_API_KEY` is unset; failures are logged and swallowed so a bounced email can never fail a paid booking.
+
+**Staff tracking**
+
+- `GET /admin/bookings?date=` — per-slot confirmed/pending guest counts, remaining capacity, guest list, and day revenue. Guarded by `x-admin-key` (placeholder until real admin auth).
+
+**Frontend**
+
+- New `frontend/src/lib/api.ts` — typed client with an `ApiError` that surfaces the 409.
+- `BookingFlow.tsx` wired to the API: calendar greys out closed and fully-booked dates from `/availability/month`; slot pills show "4 of 6 left" / "Fully booked" and disable when the party won't fit; submitting reserves the seats *before* opening Paystack; a 409 bounces back to the slot picker with refreshed counts; the callback verifies server-side before showing the confirmation.
+- Liability checkbox and its copy unchanged.
+- `frontend/.env.example` added (`NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_PAYSTACK_KEY`).
+
+**Verified against the live Neon database (2026-09-24)**
+
+- Migration `20260924222120_capacity` applied; 5 plans seeded.
+- Empty slot reports 6 of 6 free. A Trio Pass booking drops it to 3 — capacity counts guests, not bookings.
+- Trio Pass charged ₦85,000, not ₦255,000 — confirms the `perPerson` fix.
+- Filling a slot to 6 returns 409 `SLOT_FULL`; a Duo Pass is refused with 1 seat left while a Solo Pass fits.
+- **Race test:** two simultaneous requests for the last seat → exactly one 201, one 409, slot lands on 6/6. The Serializable transaction holds.
+- Seat holds: booking 4 seats drops remaining to 2; once the hold lapses the seats return automatically. `POST /bookings/:id/release` frees them immediately.
+- Rejected as expected: Sundays, past dates, PlayDate on a non-Wednesday (and accepted on a Wednesday), a party of 8, and a display label (`"11:00 AM"`) where a slot key belongs.
+- Webhook with a bad signature → 401. Admin day sheet → 503 with no key configured, 401 with a wrong key, correct per-slot guest list with the right key.
+- Test data removed afterwards: 13 bookings deleted, 5 plans retained, no members or visits created.
+
+**Also fixed:** `start:prod` ran `node dist/main`, but `nest build` emits to `dist/src/main.js` — production start would have failed on deploy. Corrected to `node dist/src/main`.
+
+Not yet exercised: the Paystack payment leg (needs test keys) and confirmation email (needs `RESEND_API_KEY`).
+
+---
+
 ## [2026-08-12] — Phase 2 & 3 complete: Shared components + homepage sections
 
 **Phase 2 — all shared components built**

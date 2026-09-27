@@ -26,7 +26,7 @@ femi-and-ifeoma/
 │   │   ├── members/             # Lookup + marketing export
 │   │   ├── bookings/            # Create/confirm — "booking creates membership"
 │   │   ├── visits/               # Workspace check-in flow
-│   │   ├── prisma/               # PrismaService (Supabase Postgres)
+│   │   ├── prisma/               # PrismaService (Neon Postgres)
 │   │   ├── app.module.ts
 │   │   └── main.ts
 │   └── package.json
@@ -70,11 +70,11 @@ femi-and-ifeoma/
 | Runtime | Node.js | |
 | Framework | **NestJS** | Chosen over Express/Fastify per the owner — see DEC-014 |
 | ORM | **Prisma** | Type-safe queries + migrations; schema at `backend/prisma/schema.prisma` |
-| Database | **Supabase Postgres** | Free tier; chosen over Neon/self-hosted per the owner — see DEC-014. No Mongo, per explicit instruction |
+| Database | **Neon Postgres** | Free tier, plain connection string. Moved off Supabase after setup failures — see DEC-015. No Mongo, per explicit instruction |
 | Auth | None yet | Staff-facing endpoints (`/members/lookup`, `/members/marketing-export`) are unauthenticated — flagged as a gap in `backend/README.md`, needs an admin login before this ships |
 | Payments | Paystack | Webhook signature verification not yet implemented — flagged as a `TODO` in `bookings.controller.ts` |
 | Email | Resend or Nodemailer | Not yet implemented |
-| Deploy | Render (free web service tier) or Fly.io | Render's own free Postgres expires after 30 days — use Supabase for the database regardless of where the API is hosted |
+| Deploy | Render (free web service tier) or Fly.io | Render's own free Postgres expires after 30 days — use Neon for the database regardless of where the API is hosted |
 
 See `docs/12-BOOKING_MEMBERSHIP_SCHEMA.md` for the full data model and the "booking creates membership" flow.
 
@@ -157,4 +157,4 @@ CORS_ORIGINS=
 
 Frontend: Vercel (recommended for Next.js)
 Backend: Render free web-service tier (or Fly.io) — see DEC-014
-Database: Supabase Postgres — see DEC-014
+Database: Neon Postgres — see DEC-015
