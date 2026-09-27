@@ -54,3 +54,6 @@ frontend/next-env.d.ts
 
 # prisma (backend)
 backend/prisma/migrations/.gitkeep
+
+# Claude Code local machine settings (permissions), not shared
+.claude/settings.local.json
