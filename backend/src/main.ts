@@ -4,7 +4,9 @@ import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: the Paystack webhook signature is an HMAC over the unparsed
+  // request bytes — re-serialising the parsed JSON would change the digest.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.useGlobalPipes(
     new ValidationPipe({
