@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
+import { PrismaRetryInterceptor } from "./prisma/prisma-retry.interceptor";
 
 async function bootstrap() {
   // rawBody: the Paystack webhook signature is an HMAC over the unparsed
@@ -15,6 +16,10 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  // Neon scale-to-zero means the first request after an idle spell can find the
+  // database still waking. Retry those rather than surfacing them as failures.
+  app.useGlobalInterceptors(new PrismaRetryInterceptor());
 
   const corsOrigins = (process.env.CORS_ORIGINS ?? "http://localhost:3000")
     .split(",")
