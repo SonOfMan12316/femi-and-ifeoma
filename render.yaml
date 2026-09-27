@@ -1,0 +1,67 @@
+# Render Blueprint for the Fémi & Ifeoma booking API.
+#
+# Render → New → Blueprint → point at this repo. Everything here is versioned;
+# the secrets are not (see `sync: false` below) and must be set once in the
+# dashboard.
+#
+# The database is Neon, not Render (DEC-015) — Render's own free Postgres
+# expires after 30 days, which is not a foundation for real bookings.
+
+services:
+  - type: web
+    name: femi-and-ifeoma-api
+    runtime: node
+    plan: free
+    region: frankfurt # closest of Render's regions to Lagos
+    rootDir: backend
+    # `migrate deploy` applies committed migrations only — it never generates
+    # or resets, so it is safe to run on every deploy.
+    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: PORT
+        value: "4000"
+
+      # ── Set these in the Render dashboard ──────────────────────────────
+      # `sync: false` keeps them out of the repo and out of the blueprint.
+
+      # Neon pooled connection string (host contains "-pooler").
+      - key: DATABASE_URL
+        sync: false
+      # Neon direct connection string — Prisma migrations need a stable
+      # session, which the pooler does not provide.
+      - key: DIRECT_URL
+        sync: false
+
+      # Paystack secret key. Verifies webhook signatures and transaction
+      # lookups. Use sk_test_… until you are taking real money.
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+
+      # Shared secret for /admin/bookings. A placeholder until real per-staff
+      # auth lands — generate a long random value, do not reuse anything.
+      - key: ADMIN_API_KEY
+        sync: false
+
+      # Resend. Leave unset to disable sending; bookings still confirm, the
+      # service logs and no-ops.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_CAFE_COPY
+        sync: false
+
+      # Comma-separated origins allowed to call this API. Must include the
+      # deployed frontend URL, or every browser request fails CORS.
+      - key: CORS_ORIGINS
+        sync: false
+
+      # No per-slot cap (DEC-021). Set a positive integer to reinstate one.
+      # - key: SLOT_CAPACITY
+      #   value: "6"
+      - key: BOOKING_HOLD_MINUTES
+        value: "10"

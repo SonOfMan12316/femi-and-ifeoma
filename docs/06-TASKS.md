@@ -112,7 +112,8 @@ Added 2026-08-11 at the owner's request: every booking should auto-create a memb
 - ⬜ Staff lookup screen (UI) for workspace check-ins — folds into the admin dashboard above; the API (`GET /members/lookup`, `POST /visits/check-in`) already exists
 - ⬜ Admin auth for `/members/lookup`, `/members/marketing-export` and `/admin/bookings` — the last uses a shared `x-admin-key` as a placeholder; the first two are still open
 - ⬜ Email/campaign export integration (Resend audience sync) — `GET /members/marketing-export` exists as the data source
-- ⬜ Deploy backend (Render free tier or Fly.io) + Neon, point frontend's `NEXT_PUBLIC_API_URL` at it
+- ⬜ Deploy backend to Render + Neon via `render.yaml`, point frontend's `NEXT_PUBLIC_API_URL` at it, and set `CORS_ORIGINS` to the Vercel URL
+- ⬜ Move the API off Render's free tier before taking real payments — free instances sleep after ~15 min, so a guest can wait ~40s for the calendar and a Paystack webhook can time out
 - ⬜ Register the webhook URL in the Paystack dashboard (`/payments/paystack/webhook`) once the backend is deployed
 - ✅ Plan catalogue cut to Solo Pass + Co-Work Space; four plans deactivated (DEC-020, 2026-09-26)
 - ⬜ `Testimonials.tsx` quotes retired plans (VIP Group Pass, PlayDate) — needs the owners' call, as these are attributed quotes
