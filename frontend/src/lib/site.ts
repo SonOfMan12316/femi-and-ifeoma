@@ -2,6 +2,9 @@ export const site = {
   name: "Fémi & Ifeoma",
   fullName: "Fémi & Ifeoma Cat Café",
   tagline: "Lagos's First Cat Café",
+  /* The brand tagline (01-BRAND_SUMMARY.md). Distinct from `tagline`, which is
+     the positioning line. This is the one the footer carries in orange. */
+  brandTagline: "Relax, Purr & Community",
   bookingUrl: "https://kindlybook.me/femiandifeoma",
   price: "₦30,000",
   sessionLength: "60-minute session",
@@ -14,7 +17,7 @@ export const site = {
      so the origin defaults to wherever the visitor is. */
   mapsUrl:
     "https://www.google.com/maps/dir/?api=1&destination=31+Adetola+Street%2C+Aguda%2C+Surulere%2C+Lagos%2C+Nigeria",
-  hours: "Monday – Saturday, 10AM – 5PM (GMT+1)",
+  hours: "Monday – Saturday, 10AM – 8PM (GMT+1)",
   closed: "Closed Sundays",
   email: "hello@femiandifeoma.com",
   phone: "+234 706 484 7573",
@@ -28,61 +31,39 @@ export type Plan = {
   durationMins: number;
   price: number; // NGN
   perPerson: boolean;
-  guestCount?: number; // for fixed-guest passes like Duo
+  guestCount?: number; // for fixed-guest passes
   description: string;
-  schedule?: string; // e.g. "Every Wednesday" for recurring, non-daily plans
+  schedule?: string; // e.g. "Monday – Saturday, 10 AM – 8 PM"
+  /**
+   * A whole-day pass is booked by date alone — no time slot. The booking flow
+   * skips the time picker for these. Mirrors Plan.bookingType = "workspace"
+   * on the backend (DEC-020).
+   */
+  wholeDay?: boolean;
 };
 
 // Sourced from the Kindly booking page (app.kindlybook.com/book-business/femiandifeoma).
 // Standing plans only — excludes the time-boxed "Sip & Paint" International Cat Day event passes.
 export const plans: Plan[] = [
   {
-    id: "playdate",
-    name: "PlayDate",
-    durationMins: 90,
-    price: 10000,
-    perPerson: true,
-    description: "Cat play date. A relaxed 90 minutes with the cats.",
-    schedule: "Every Wednesday",
-  },
-  {
     id: "solo-pass",
-    name: "Solo Pass",
+    name: "Solo Pass for the Cat Cafe",
     durationMins: 60,
     price: 30000,
     perPerson: true,
     description:
-      "1 chilled beverage (Nescafé cold coffee or Lipton iced tea), 1 treat (banana bread or cake parfait), 1 cat treat pack, free high-speed Wi-Fi.",
+      "1 chilled beverage (choice of Nescafé Cold Coffee or Lipton Iced Tea, served over ice), 1 treat (choice of banana bread or cake parfait), 1 cat treat pack, free high-speed Wi-Fi.",
   },
   {
-    id: "duo-pass",
-    name: "Duo Pass",
-    durationMins: 60,
-    price: 58000,
+    id: "cowork-space",
+    name: "Co-Work Space",
+    durationMins: 600, // the opening day, not a session
+    price: 6000,
     perPerson: true,
-    guestCount: 2,
     description:
-      "2 guests · 2 chilled beverages, 1 shared dessert combo (banana bread + cake parfait), 2 cat treat packs.",
-  },
-  {
-    id: "trio-pass",
-    name: "Trio Pass",
-    durationMins: 60,
-    price: 85000,
-    perPerson: true,
-    guestCount: 3,
-    description:
-      "3 chilled beverages, 1 shared dessert board (2 banana breads + 1 parfait), 3 cat treat packs.",
-  },
-  {
-    id: "vip-group-pass",
-    name: "VIP Group Pass",
-    durationMins: 60,
-    price: 140000,
-    perPerson: true,
-    guestCount: 5,
-    description:
-      "5 chilled beverages, 2 shared dessert platters (mix of banana breads & parfaits), 5 cat treat packs.",
+      "Co-work with cats. A relaxed, cat-friendly space to work, study, take meetings or get things done. Bring your laptop, find a spot, and get to work with cats around.",
+    schedule: "₦6,000/day · 10 AM – 8 PM, Monday – Saturday",
+    wholeDay: true,
   },
 ];
 
@@ -155,7 +136,8 @@ export const faqs = [
   },
   {
     question: "How long is a visit?",
-    answer: `Plans run from ${plans.length} options, starting at ₦${plansFromPrice.toLocaleString("en-NG")} per person — from a 90-minute PlayDate to group passes with beverages and treats included.`,
+    answer:
+      "Two options: a Solo Pass at ₦30,000 for a 60-minute visit with a chilled beverage, a treat and a cat treat pack — or the Co-Work Space at ₦6,000 a day if you'd rather bring a laptop and work with cats around.",
   },
   {
     question: "Can children visit?",
@@ -184,11 +166,11 @@ export const houseRules = [
   "If a cat walks away, give them space.",
 ] as const;
 
+// Real destinations only. "About Us", "House Rules" and "FAQs" were removed —
+// all three are homepage sections a visitor scrolls past anyway, so a nav
+// entry that only jumps down the page you're already on is weight without
+// navigation. Each section keeps its id, so existing deep links still resolve.
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/book-your-visit", label: "Book Your Visit" },
-  { href: "/our-cats", label: "Our Cats" },
-  { href: "/#about", label: "About Us" },
-  { href: "/faqs", label: "FAQs" },
-  { href: "/#rules", label: "House Rules" },
 ] as const;
