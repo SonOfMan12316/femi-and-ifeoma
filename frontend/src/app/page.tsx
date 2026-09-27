@@ -1,4 +1,5 @@
 import { About } from "@/components/About";
+import { Faqs } from "@/components/Faqs";
 import { ContentBlock } from "@/components/ContentBlock";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
@@ -17,9 +18,7 @@ export default function Home() {
         <ContentBlock
           eyebrow="Curious?"
           title="What in the world is a cat café?"
-          body="Can I live here? Can I quit my job and work for you? How do you deal with all this cuteness in one place? Click below for answers to life's most pressing questions."
-          ctaLabel="Frequently Asked Questions"
-          ctaHref="/faqs"
+          body="Can I live here? Can I quit my job and work for you? How do you deal with all this cuteness in one place? Scroll on — we answer life's most pressing questions further down."
           image={{
             src: "/uploads/WhatsApp Image 2026-07-27 at 18.47.50.jpeg",
             alt: "Inside the café lounge",
@@ -30,7 +29,7 @@ export default function Home() {
           reverse
           eyebrow="Visit us"
           title="Ready for a slow hour in Lagos?"
-          body={`Plans start at ₦${plansFromPrice.toLocaleString("en-NG")} per person, from a quick PlayDate to group passes with drinks and treats. Reservations required. Walk-ins only if space opens up.`}
+          body={`A Solo Pass is ₦30,000 for 60 minutes with a chilled drink, a treat and a cat treat pack. Prefer to work? The Co-Work Space is ₦${plansFromPrice.toLocaleString("en-NG")} a day, 10 AM – 8 PM. Reservations required. Walk-ins only if space opens up.`}
           ctaLabel="Book Your Visit"
           ctaHref="/book-your-visit"
           image={{
@@ -40,6 +39,7 @@ export default function Home() {
         />
         <About />
         <HouseRules />
+        <Faqs />
       </main>
       <Footer />
     </>
