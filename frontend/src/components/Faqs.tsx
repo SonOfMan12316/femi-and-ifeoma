@@ -38,15 +38,31 @@ export function Faqs() {
                     <span className="font-display text-[20px] text-brick md:text-[22px]">
                       {faq.question}
                     </span>
-                    <span className="text-[22px] text-orange" aria-hidden>
-                      {open ? "−" : "+"}
+                    {/*
+                      A rotating plus reads as one mark becoming another, where
+                      swapping the glyph reads as two separate characters.
+                    */}
+                    <span
+                      className="text-[22px] leading-none text-orange transition-transform duration-[var(--duration-collapse)] ease-[var(--ease-out)]"
+                      style={{ transform: open ? "rotate(135deg)" : "rotate(0deg)" }}
+                      aria-hidden
+                    >
+                      +
                     </span>
                   </button>
-                  {open ? (
-                    <p className="pb-5 text-[16px] font-light leading-relaxed text-[var(--ink-muted)]">
-                      {faq.answer}
-                    </p>
-                  ) : null}
+                  {/*
+                    Always rendered, never conditionally mounted — a transition
+                    needs both states to exist. `.collapse` animates
+                    grid-template-rows 0fr → 1fr, so it opens to the answer's
+                    natural height without measuring it.
+                  */}
+                  <div className="collapse" data-open={open} aria-hidden={!open}>
+                    <div>
+                      <p className="pb-5 text-[16px] font-light leading-relaxed text-[var(--ink-muted)]">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </Reveal>
             );

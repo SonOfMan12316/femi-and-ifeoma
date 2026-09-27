@@ -17,7 +17,7 @@ export function Nav() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-[box-shadow] duration-300 ease-[var(--ease-out)] ${
         scrolled
           ? "bg-cream shadow-[0_1px_12px_rgba(12,12,12,0.08)]"
           : "bg-cream"
@@ -60,23 +60,40 @@ export function Nav() {
         </button>
       </nav>
 
-      {/* Mobile menu */}
-      {open ? (
-        <div className="border-t border-[var(--ink-line)] bg-cream px-6 py-6 lg:hidden">
-          <div className="flex flex-col gap-5">
-            {navLinks.map((link) => (
-              <a
-                key={`m-${link.label}`}
-                href={link.href}
-                className="text-[13.5px] font-medium uppercase tracking-[0.08em] text-black/60 transition-colors hover:text-orange"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
+      {/*
+        Mobile menu. Always rendered so it can transition — a conditional mount
+        has no "before" state to animate from. `inert` keeps the closed drawer
+        out of the tab order and off screen readers.
+      */}
+      <div
+        className="collapse lg:hidden [transition-timing-function:var(--ease-drawer)] [transition-duration:var(--duration-drawer)]"
+        data-open={open}
+        inert={!open}
+      >
+        <div>
+          <div className="border-t border-[var(--ink-line)] bg-cream px-6 py-6">
+            <div className="flex flex-col gap-5">
+              {navLinks.map((link, index) => (
+                <a
+                  key={`m-${link.label}`}
+                  href={link.href}
+                  className="text-[13.5px] font-medium uppercase tracking-[0.08em] text-black/60 transition-colors duration-[250ms] ease-[var(--ease-out)] hover:text-orange"
+                  style={{
+                    // Links arrive just behind the panel rather than with it,
+                    // so the drawer reads as opening and then filling.
+                    transitionDelay: open ? `${80 + index * 30}ms` : "0ms",
+                    opacity: open ? 1 : 0,
+                    transitionProperty: "opacity, color",
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-      ) : null}
+      </div>
     </header>
   );
 }

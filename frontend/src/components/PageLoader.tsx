@@ -62,7 +62,7 @@ export function PageLoader() {
         backgroundColor: "#ffffff",
         pointerEvents: hiding ? "none" : "auto",
         opacity: hiding ? 0 : 1,
-        transition: "opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
+        transition: "opacity 0.7s var(--ease-out)",
       }}
     >
       <div className="loader-content flex flex-col items-center gap-0">

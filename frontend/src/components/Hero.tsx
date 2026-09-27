@@ -97,7 +97,7 @@ export function Hero() {
 
                 {/* Open Hours Card */}
                 <div
-                  className="bg-white rounded-[22px] px-6 py-6 transition-all duration-300 hover:-translate-y-1"
+                  className="hover-lift bg-white rounded-[22px] px-6 py-6 transition-[transform,box-shadow] duration-[250ms] ease-[var(--ease-out)]"
                   style={{
                     boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                   }}
@@ -117,7 +117,7 @@ export function Hero() {
                         className="text-[15px] font-medium leading-tight text-[var(--black)]"
                         style={{ fontFamily: "var(--font-body)" }}
                       >
-                        Mon – Sat<br />10AM – 5PM
+                        Mon – Sat<br />10AM – 8PM
                       </div>
                     </div>
                   </div>
@@ -125,7 +125,7 @@ export function Hero() {
 
                 {/* Location Card */}
                 <div
-                  className="bg-white rounded-[22px] px-6 py-6 transition-all duration-300 hover:-translate-y-1"
+                  className="hover-lift bg-white rounded-[22px] px-6 py-6 transition-[transform,box-shadow] duration-[250ms] ease-[var(--ease-out)]"
                   style={{
                     boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                   }}
@@ -153,7 +153,7 @@ export function Hero() {
 
                 {/* Session Card */}
                 <div
-                  className="bg-white rounded-[22px] px-6 py-6 transition-all duration-300 hover:-translate-y-1"
+                  className="hover-lift bg-white rounded-[22px] px-6 py-6 transition-[transform,box-shadow] duration-[250ms] ease-[var(--ease-out)]"
                   style={{
                     boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                   }}
