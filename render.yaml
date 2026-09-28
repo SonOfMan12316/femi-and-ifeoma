@@ -14,9 +14,15 @@ services:
     plan: free
     region: frankfurt # closest of Render's regions to Lagos
     rootDir: backend
+    # `npm install`, not `npm ci`: the repo root declares `workspaces`, so npm
+    # treats backend/ as a workspace member and looks for the lockfile at the
+    # root — where it is deliberately gitignored (it broke the Vercel build,
+    # commit 50e06de). `npm ci` therefore fails here even though
+    # backend/package-lock.json is present and valid.
+    #
     # `migrate deploy` applies committed migrations only — it never generates
     # or resets, so it is safe to run on every deploy.
-    buildCommand: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /health
     envVars:
