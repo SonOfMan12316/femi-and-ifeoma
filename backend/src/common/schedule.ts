@@ -32,6 +32,9 @@ export const TIME_SLOTS: TimeSlot[] = [
 export const ALL_DAY = "all-day";
 export const ALL_DAY_LABEL = "All day (10 AM – 8 PM)";
 
+/** Minutes past midnight when the café closes. The last session ends here. */
+export const CLOSING_MINUTES = 20 * 60;
+
 export const SLOT_VALUES = TIME_SLOTS.map((slot) => slot.value);
 
 /** Every value `bookings.time_slot` may legitimately hold. */
@@ -103,4 +106,51 @@ export function lagosToday(): Date {
     day: "2-digit",
   }).format(new Date());
   return parseCalendarDate(parts);
+}
+
+/** A slot key ("14:00") as minutes past midnight. */
+export function slotStartMinutes(value: string): number {
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * The current time in Africa/Lagos, as minutes past midnight.
+ *
+ * Read through Intl rather than the server's clock: Render runs in Frankfurt,
+ * so `new Date().getHours()` would be an hour off from the café's own day and
+ * would keep a 10:00 slot bookable until 11:00 Lagos time.
+ */
+export function lagosNowMinutes(): number {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Africa/Lagos",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return hour * 60 + minute;
+}
+
+/** True when this calendar date is today in Lagos. */
+export function isLagosToday(date: Date): boolean {
+  return date.getTime() === lagosToday().getTime();
+}
+
+/**
+ * Has this slot passed, for a booking made right now?
+ *
+ * Only meaningful for today — a slot on a future date has obviously not
+ * started. `leadMinutes` lets the café refuse last-minute bookings: at a lead
+ * of 30, the 11:00 slot stops being bookable at 10:30.
+ */
+export function hasSlotPassed(date: Date, slotValue: string, leadMinutes: number): boolean {
+  if (!isLagosToday(date)) return false;
+  const now = lagosNowMinutes();
+  if (slotValue === ALL_DAY) {
+    // A day pass stays useful until the café closes.
+    return now >= CLOSING_MINUTES;
+  }
+  return slotStartMinutes(slotValue) <= now + leadMinutes;
 }
