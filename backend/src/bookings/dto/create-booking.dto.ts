@@ -1,17 +1,28 @@
-import { IsBoolean, IsEmail, IsIn, IsInt, IsISO8601, IsOptional, IsString, Min } from "class-validator";
+import { IsBoolean, IsEmail, IsIn, IsInt, IsOptional, IsString, Matches, Max, Min } from "class-validator";
+import { SLOT_VALUES } from "../../common/schedule";
 
 export class CreateBookingDto {
   @IsString()
   planId!: string;
 
-  @IsISO8601()
-  bookingDate!: string; // "YYYY-MM-DD"
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: "bookingDate must be in YYYY-MM-DD format" })
+  bookingDate!: string;
 
-  @IsString()
-  timeSlot!: string; // e.g. "11:00 AM"
+  /**
+   * Canonical 24h slot key, e.g. "11:00" — not a display label. Omitted for
+   * whole-day passes (Co-Work), which the server resolves to the ALL_DAY key.
+   */
+  @IsOptional()
+  @IsIn(SLOT_VALUES, { message: `timeSlot must be one of: ${SLOT_VALUES.join(", ")}` })
+  timeSlot?: string;
 
+  /**
+   * Ignored for fixed-size passes (Duo/Trio/VIP) — the plan's guestCount wins,
+   * so the party size and the price can never disagree.
+   */
   @IsInt()
   @Min(1)
+  @Max(50)
   partySize!: number;
 
   @IsString()
@@ -30,12 +41,4 @@ export class CreateBookingDto {
   @IsOptional()
   @IsBoolean()
   marketingOptIn?: boolean;
-}
-
-export class ConfirmBookingDto {
-  @IsString()
-  paymentReference!: string;
-
-  @IsIn(["paid", "failed"])
-  paymentStatus!: "paid" | "failed";
 }

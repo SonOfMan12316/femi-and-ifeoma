@@ -1,76 +1,62 @@
-// Seeds the plans table from the same data currently duplicated in
-// frontend/src/lib/site.ts. Once this backend is live, site.ts should fetch
-// from GET /plans instead of hardcoding — see DEC-013 in /docs/08-DECISIONS.md.
+// Seeds the plans table. Mirrors frontend/src/lib/site.ts — keep the two in
+// sync until the frontend fetches from GET /plans (see DEC-013).
+//
+// Retired plans are deactivated, never deleted: confirmed bookings reference
+// them by foreign key, and deleting the row would orphan a real customer's
+// booking history.
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 const plans = [
   {
-    id: "playdate",
-    name: "PlayDate",
-    durationMins: 90,
-    priceKobo: 1_000_000,
-    perPerson: true,
-    guestCount: null,
-    description: "Cat play date. A relaxed 90 minutes with the cats.",
-    schedule: "Every Wednesday",
-  },
-  {
     id: "solo-pass",
-    name: "Solo Pass",
+    name: "Solo Pass for the Cat Cafe",
     durationMins: 60,
-    priceKobo: 3_000_000,
+    priceKobo: 3_000_000, // ₦30,000
     perPerson: true,
     guestCount: null,
     description:
-      "1 chilled beverage (Nescafé cold coffee or Lipton iced tea), 1 treat (banana bread or cake parfait), 1 cat treat pack, free high-speed Wi-Fi.",
+      "1 chilled beverage (choice of Nescafé Cold Coffee or Lipton Iced Tea, served over ice), 1 treat (choice of banana bread or cake parfait), 1 cat treat pack, free high-speed Wi-Fi.",
     schedule: null,
+    bookingType: "cafe_visit" as const,
   },
   {
-    id: "duo-pass",
-    name: "Duo Pass",
-    durationMins: 60,
-    priceKobo: 5_800_000,
+    id: "cowork-space",
+    name: "Co-Work Space",
+    // A day pass: the guest books a date and comes when they like between
+    // 10 AM and 8 PM, so the duration is the opening day, not a session.
+    durationMins: 600,
+    priceKobo: 600_000, // ₦6,000 per person, per day
     perPerson: true,
-    guestCount: 2,
+    guestCount: null,
     description:
-      "2 guests · 2 chilled beverages, 1 shared dessert combo (banana bread + cake parfait), 2 cat treat packs.",
-    schedule: null,
-  },
-  {
-    id: "trio-pass",
-    name: "Trio Pass",
-    durationMins: 60,
-    priceKobo: 8_500_000,
-    perPerson: true,
-    guestCount: 3,
-    description: "3 chilled beverages, 1 shared dessert board (2 banana breads + 1 parfait), 3 cat treat packs.",
-    schedule: null,
-  },
-  {
-    id: "vip-group-pass",
-    name: "VIP Group Pass",
-    durationMins: 60,
-    priceKobo: 14_000_000,
-    perPerson: true,
-    guestCount: 5,
-    description:
-      "5 chilled beverages, 2 shared dessert platters (mix of banana breads & parfaits), 5 cat treat packs.",
-    schedule: null,
+      "Co-work with cats. A relaxed, cat-friendly space to work, study, take meetings or get things done. ₦6,000/day, 10 AM – 8 PM, Monday – Saturday. Free Wi-Fi. Bring your laptop, find a spot, get to work with cats around.",
+    schedule: "Monday – Saturday, 10 AM – 8 PM",
+    // Drives the whole-day booking path — no time slot (DEC-020).
+    bookingType: "workspace" as const,
   },
 ];
+
+/** Retired in DEC-020. Deactivated so existing bookings keep their plan. */
+const retiredPlanIds = ["playdate", "duo-pass", "trio-pass", "vip-group-pass"];
 
 async function main() {
   for (const plan of plans) {
     await prisma.plan.upsert({
       where: { id: plan.id },
-      create: plan,
-      update: plan,
+      create: { ...plan, active: true },
+      update: { ...plan, active: true },
     });
   }
+
+  const { count } = await prisma.plan.updateMany({
+    where: { id: { in: retiredPlanIds } },
+    data: { active: false },
+  });
+
   // eslint-disable-next-line no-console
-  console.log(`Seeded ${plans.length} plans.`);
+  console.log(`Seeded ${plans.length} active plans; deactivated ${count} retired plan(s).`);
 }
 
 main()

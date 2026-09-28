@@ -86,29 +86,37 @@
 - ✅ Confirmation / success page — exists in `BookingFlow.tsx`
 - ✅ Payment integration styled — Paystack inline, styled with tokens
 - ✅ Real plans wired in (5 plans from Kindly: PlayDate, Solo/Duo/Trio/VIP Group Pass) — added 2026-08-11 (DEC-013)
-- ⬜ Backend: persist bookings to a real database (currently front-end only — Paystack succeeds but nothing is stored server-side)
-- ⬜ Backend: booking confirmation email (Resend/Nodemailer, per `07-ARCHITECTURE.md`)
-- ⬜ Availability: replace static Mon–Sat/all-time-slots-open logic with real capacity checks
+- ✅ Backend: persist bookings to a real database — `POST /bookings` writes a pending booking before payment (2026-09-24)
+- ✅ Backend: booking confirmation email — `backend/src/email/`, Resend via `fetch` (2026-09-24)
+- ✅ Availability: real capacity checks — 6 guests per slot, `GET /availability` drives the calendar and slot pills (DEC-016, 2026-09-24)
+- ✅ Migration run against Neon, plans seeded, capacity behaviour verified against the live database (2026-09-24)
+- ⬜ Re-test a fresh booking end-to-end now that the Paystack `ref` bug is fixed (2026-09-26) — first real payment succeeded but had to be reconciled by hand
 
-**Phase 4 Gate:** ✅ Booking works end-to-end in staging environment (blocked on backend persistence above).
+**Phase 4 Gate:** ⬜ Booking works end-to-end in staging (API verified against Neon; payment leg untested pending Paystack test keys).
 
 ---
 
 ## Phase 6 — Membership & Retention (backend)
 
-Added 2026-08-11 at the owner's request: every booking should auto-create a member so guests don't re-register to return or use the workspace, and so the café can retain guest data for email/campaigns. Schema designed in `12-BOOKING_MEMBERSHIP_SCHEMA.md`. Repo split and backend scaffolded 2026-08-11 (DEC-014) — NestJS + Prisma + Supabase Postgres in `backend/`.
+Added 2026-08-11 at the owner's request: every booking should auto-create a member so guests don't re-register to return or use the workspace, and so the café can retain guest data for email/campaigns. Schema designed in `12-BOOKING_MEMBERSHIP_SCHEMA.md`. Repo split and backend scaffolded 2026-08-11 (DEC-014) — NestJS + Prisma + Postgres in `backend/` (Neon since DEC-015).
 
 - ✅ Design data model doc (`members`, `bookings`, `plans`, `visits` tables) — `12-BOOKING_MEMBERSHIP_SCHEMA.md`
 - ✅ Split repo into `frontend/` and `backend/` (plain two-folder monorepo, DEC-014)
 - ✅ Scaffold NestJS backend: Prisma schema, `plans`/`members`/`bookings`/`visits` modules, seed script — builds and lints clean
 - ⬜ Confirm open questions with owner (marketing opt-in default, workspace eligibility rules, email-optional guests, cancellation policy) — see `12-BOOKING_MEMBERSHIP_SCHEMA.md`
-- ⬜ Create the actual Supabase project, set `DATABASE_URL` in `backend/.env`, run `prisma migrate` + `prisma:seed`
-- ⬜ Wire `BookingFlow.tsx` on the frontend to call the backend (`POST /bookings` → Paystack → `POST /bookings/:id/confirm`) instead of only calling Paystack directly
-- ⬜ Paystack webhook signature verification (flagged `TODO` in `bookings.controller.ts`)
-- ⬜ Staff lookup screen (UI) for workspace check-ins — the API (`GET /members/lookup`, `POST /visits/check-in`) exists, no frontend for it yet
-- ⬜ Admin auth for `/members/lookup` and `/members/marketing-export` (currently open/unauthenticated)
+- ✅ Neon project created, `DATABASE_URL` + `DIRECT_URL` set, `prisma migrate` + `prisma:seed` run (2026-09-24)
+- ✅ Wire `BookingFlow.tsx` to the backend (`POST /bookings` → Paystack → `POST /bookings/:id/verify`) (2026-09-24)
+- ✅ Paystack webhook signature verification — `POST /payments/paystack/webhook`, HMAC-SHA512 over the raw body (2026-09-24)
+- ✅ Per-slot capacity tracking with seat holds (DEC-016, DEC-017) and the staff day sheet `GET /admin/bookings?date=` (2026-09-24)
+- ⬜ **Admin dashboard** (requested by owner 2026-09-26) — a staff-facing UI, not just the API. Minimum: today's bookings by slot with live capacity, mark a guest arrived, look a member up by email/phone, and see payments. Needs real admin auth first (below), and needs DEC-020 answered — what "confirm" means, since payment already confirms a booking automatically
+- ⬜ Staff lookup screen (UI) for workspace check-ins — folds into the admin dashboard above; the API (`GET /members/lookup`, `POST /visits/check-in`) already exists
+- ⬜ Admin auth for `/members/lookup`, `/members/marketing-export` and `/admin/bookings` — the last uses a shared `x-admin-key` as a placeholder; the first two are still open
 - ⬜ Email/campaign export integration (Resend audience sync) — `GET /members/marketing-export` exists as the data source
-- ⬜ Deploy backend (Render free tier or Fly.io) + Supabase, point frontend's `NEXT_PUBLIC_API_URL` at it
+- ⬜ Deploy backend to Render + Neon via `render.yaml`, point frontend's `NEXT_PUBLIC_API_URL` at it, and set `CORS_ORIGINS` to the Vercel URL
+- ⬜ Move the API off Render's free tier before taking real payments — free instances sleep after ~15 min, so a guest can wait ~40s for the calendar and a Paystack webhook can time out
+- ⬜ Register the webhook URL in the Paystack dashboard (`/payments/paystack/webhook`) once the backend is deployed
+- ✅ Plan catalogue cut to Solo Pass + Co-Work Space; four plans deactivated (DEC-020, 2026-09-26)
+- ⬜ `Testimonials.tsx` quotes retired plans (VIP Group Pass, PlayDate) — needs the owners' call, as these are attributed quotes
 
 **Phase 6 Gate:** ✅ A booking creates/updates a member record end-to-end in staging; a returning member can be looked up by email or phone.
 

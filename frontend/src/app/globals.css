@@ -91,6 +91,23 @@
   --shadow-lg:    0 8px 32px rgba(12, 12, 12, 0.12);
   --shadow-lift:  0 16px 48px rgba(12, 12, 12, 0.12);
 
+  /* Accent-tinted surfaces. Selection reads as a soft warm glow rather than
+     a hard outline — the brand has no harsh borders. */
+  --accent-ring:   0 0 0 2px rgba(248, 94, 40, 0.45);
+  --accent-glow:   0 8px 28px rgba(248, 94, 40, 0.18);
+  --accent-tint:   rgba(248, 94, 40, 0.06);
+  --accent-tint-2: rgba(248, 94, 40, 0.10);
+
+  /* Booking card palette. Specified directly for this surface; note
+     --booking-accent (#D85A30) is a shade deeper than the brand orange
+     (#F85E28, --orange) — see the note in 08-DECISIONS.md. */
+  --booking-accent:    #D85A30;
+  --booking-peach:     #FAECE7;
+  --booking-icon:      #993C1D;
+  --booking-border:    rgba(12, 12, 12, 0.10);
+  --booking-panel:     #FAFAFA;
+  --booking-muted:     rgba(12, 12, 12, 0.50);
+
   /* Image fade duration — collapsed to 0s for reduced-motion users */
   --img-fade-duration: 0.65s;
 
@@ -208,6 +225,159 @@ body {
 }
 
 /* ─────────────────────────────────────────
+   Motion tokens
+
+   One vocabulary for every animation on the site. Built-in CSS easings are
+   too weak for deliberate motion, so these are the canonical curves.
+
+   The brand is "calm over chaos" and "slow afternoons" — so durations sit at
+   the unhurried end of each budget, and nothing bounces. Motion here should
+   settle, never snap.
+───────────────────────────────────────── */
+
+:root {
+  /* Strong ease-out. Entrances and exits — the default. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Strong ease-in-out. Movement between two on-screen positions. */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  /* iOS drawer curve. Panels that slide open. */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* UI motion stays under 300ms; a 200ms panel feels faster than a 400ms one. */
+  --duration-press: 160ms;
+  --duration-collapse: 220ms;
+  --duration-step: 260ms;
+  --duration-drawer: 280ms;
+}
+
+/* ─────────────────────────────────────────
+   Collapse (FAQ answers, mobile nav drawer)
+
+   grid-template-rows 0fr → 1fr animates to the content's natural height
+   without measuring it in JS and without animating to `auto`. The child must
+   be overflow:hidden and min-height:0 or it refuses to shrink below its
+   content.
+
+   This is one of the few animations that costs layout on every frame, so the
+   duration is deliberately short.
+───────────────────────────────────────── */
+
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--duration-collapse) var(--ease-out),
+    opacity var(--duration-collapse) var(--ease-out);
+}
+
+.collapse > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.collapse[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* ─────────────────────────────────────────
+   Step transition (booking flow)
+
+   Bridges the four booking steps, which otherwise teleport. Direction carries
+   meaning: forward drifts up into place, Back drifts down, so the flow has a
+   consistent sense of where you are in it.
+───────────────────────────────────────── */
+
+@keyframes step-in-forward {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes step-in-back {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-enter {
+  animation: step-in-forward var(--duration-step) var(--ease-out) both;
+}
+
+.step-enter[data-direction="back"] {
+  animation-name: step-in-back;
+}
+
+/* ─────────────────────────────────────────
+   Staggered list entrance
+
+   Decorative only — items are visible and interactive throughout; the delay
+   affects appearance, never availability.
+───────────────────────────────────────── */
+
+.stagger-item {
+  opacity: 0;
+  animation: fade-up 420ms var(--ease-out) forwards;
+}
+
+/* ─────────────────────────────────────────
+   Pointer-gated hover motion
+
+   Hover transforms must be gated to real pointers: on touch, a tap fires a
+   synthetic hover and the element sticks in its hovered state after the
+   finger lifts. Written as plain CSS because Tailwind's arbitrary-variant
+   syntax for compound media queries generates invalid output.
+───────────────────────────────────────── */
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-grow:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-grow:hover {
+    box-shadow: var(--accent-glow);
+  }
+
+  /* Image zooms driven by a hovered parent. Same gate, group form. */
+  .group:hover .group-zoom {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-lift:hover,
+  .hover-grow:hover,
+  .group:hover .group-zoom {
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Selection badge
+
+   The checkmark scales up from 0.8 rather than 0 — nothing in the real world
+   appears from nothing, and scale(0) reads as a pop rather than an arrival.
+───────────────────────────────────────── */
+
+@keyframes badge-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.badge-in {
+  animation: badge-in 200ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-in {
+    animation: step-fade 140ms var(--ease-out) both;
+  }
+}
+
+/* ─────────────────────────────────────────
    Scroll reveal
 ───────────────────────────────────────── */
 
@@ -226,11 +396,28 @@ body {
   opacity: 0;
   transform: translateY(20px);
   transition:
-    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.65s var(--ease-out),
+    transform 0.65s var(--ease-out);
 }
 
 .reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Children of a Reveal that arrive one after another. Each sets its own
+   transition-delay inline; the parent's is-visible class is the trigger.
+   Used where wrapping each child in its own Reveal would break the markup
+   (list items inside <ol>). */
+.reveal .stagger-child {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 420ms var(--ease-out),
+    transform 420ms var(--ease-out);
+}
+
+.reveal.is-visible .stagger-child {
   opacity: 1;
   transform: translateY(0);
 }
@@ -241,7 +428,7 @@ body {
 
 .hero-animate {
   opacity: 0;
-  animation: fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: fade-up 0.9s var(--ease-out) forwards;
 }
 
 .hero-animate-delay-1 { animation-delay: 0.10s; }
@@ -305,7 +492,7 @@ body {
 }
 
 .loader-content {
-  animation: loader-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: loader-fade-in 0.5s var(--ease-out) both;
 }
 
 /* ─────────────────────────────────────────
@@ -317,15 +504,30 @@ body {
     --img-fade-duration: 0s;
   }
 
+  /* Movement is what reduced motion asks us to drop — not feedback. These
+     keep their fade so content still arrives rather than popping. */
   .hero-animate {
-    animation: none;
-    opacity: 1;
+    opacity: 0;
+    transform: none;
+    animation: step-fade 200ms var(--ease-out) forwards;
   }
 
   .reveal {
+    opacity: 0;
+    transform: none;
+    transition: opacity 200ms var(--ease-out);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+  }
+
+  .reveal .stagger-child,
+  .reveal.is-visible .stagger-child {
     opacity: 1;
     transform: none;
     transition: none;
+    transition-delay: 0ms !important;
   }
 
   .hero-image-zoom {
@@ -346,4 +548,26 @@ body {
   .loader-content {
     animation: none;
   }
+
+  /* Collapses keep their fade — it explains the state change — but stop
+     animating size, which is the part that reads as movement. */
+  .collapse {
+    transition: opacity 120ms var(--ease-out);
+  }
+
+  /* Steps and staggered lists fade without travelling. */
+  .step-enter,
+  .step-enter[data-direction="back"] {
+    animation: step-fade 140ms var(--ease-out) both;
+  }
+
+  .stagger-item {
+    animation: step-fade 140ms var(--ease-out) forwards;
+    animation-delay: 0ms !important;
+  }
+}
+
+@keyframes step-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

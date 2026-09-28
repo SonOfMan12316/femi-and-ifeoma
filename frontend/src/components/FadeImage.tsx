@@ -26,7 +26,7 @@ export function FadeImage({ style, onLoad, ...props }: FadeImageProps) {
         ...style,
         opacity: loaded ? 1 : 0,
         // var(--img-fade-duration) collapses to 0s when prefers-reduced-motion is set
-        transition: "opacity var(--img-fade-duration, 0.65s) cubic-bezier(0.22, 1, 0.36, 1)",
+        transition: "opacity var(--img-fade-duration, 0.65s) var(--ease-out)",
       }}
       onLoad={(e) => {
         setLoaded(true);

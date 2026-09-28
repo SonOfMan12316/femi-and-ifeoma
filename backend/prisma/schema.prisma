@@ -1,6 +1,6 @@
 // Prisma schema for the Fémi & Ifeoma Cat Café booking + membership backend.
 // Mirrors the design in /docs/12-BOOKING_MEMBERSHIP_SCHEMA.md — keep the two in sync.
-// Target: Supabase Postgres (DATABASE_URL in .env, see .env.example).
+// Target: Neon Postgres (DATABASE_URL in .env, see .env.example) — DEC-015.
 
 generator client {
   provider = "prisma-client-js"
@@ -24,6 +24,7 @@ enum BookingStatus {
   cancelled
   completed
   no_show
+  expired
 }
 
 enum PaymentStatus {
@@ -78,17 +79,33 @@ model Member {
 
 model Booking {
   id                String        @id @default(uuid())
-  memberId          String        @map("member_id")
-  member            Member        @relation(fields: [memberId], references: [id])
+  // Null until payment is confirmed. Membership is granted on payment, not on
+  // form submit, so abandoned checkouts never pollute the member list (DEC-019).
+  memberId          String?       @map("member_id")
+  member            Member?       @relation(fields: [memberId], references: [id])
   planId            String        @map("plan_id")
   plan              Plan          @relation(fields: [planId], references: [id])
   bookingDate       DateTime      @map("booking_date") @db.Date
+  // Canonical 24h slot key, e.g. "10:00". Display labels live on the frontend.
   timeSlot          String        @map("time_slot")
   partySize         Int           @default(1) @map("party_size")
   status            BookingStatus @default(pending)
   amountKobo        Int           @map("amount_kobo")
   paymentReference  String?       @unique @map("payment_reference")
   paymentStatus     PaymentStatus @default(pending) @map("payment_status")
+
+  // Guest details as entered at booking time. Copied onto the member record at
+  // confirmation; kept here so a pending booking has contact info without a member.
+  guestFirstName    String        @map("guest_first_name")
+  guestLastName     String        @map("guest_last_name")
+  guestEmail        String        @map("guest_email")
+  guestPhone        String?       @map("guest_phone")
+  marketingOptIn    Boolean       @default(false) @map("marketing_opt_in")
+
+  // A pending booking holds its seats until this moment, so two guests can't
+  // both clear the capacity check while one is inside the Paystack iframe (DEC-017).
+  holdExpiresAt     DateTime?     @map("hold_expires_at")
+
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
 
@@ -96,7 +113,25 @@ model Booking {
 
   @@index([memberId])
   @@index([bookingDate])
+  // Drives the per-slot capacity count in AvailabilityService.
+  @@index([bookingDate, timeSlot])
+  @@index([guestEmail])
   @@map("bookings")
+}
+
+/// Staff-controlled blackout. timeSlot "*" closes the whole day (public
+/// holiday, deep clean); a real slot key closes just that slot (private event).
+/// A sentinel rather than null so @@unique actually prevents duplicates —
+/// Postgres treats NULLs as distinct in unique indexes.
+model SlotClosure {
+  id        String   @id @default(uuid())
+  date      DateTime @db.Date
+  timeSlot  String   @default("*") @map("time_slot")
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date, timeSlot])
+  @@map("slot_closures")
 }
 
 model Visit {
