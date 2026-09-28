@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Prisma, BookingStatus, Plan } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
-import { slotCapacity } from "../common/capacity.config";
+import { leadMinutes, slotCapacity } from "../common/capacity.config";
 import {
   ALL_DAY,
   ALL_DAY_LABEL,
@@ -10,6 +10,8 @@ import {
   TIME_SLOTS,
   calendarWeekday,
   formatCalendarDate,
+  hasSlotPassed,
+  isLagosToday,
   isWholeDayPlan,
   lagosToday,
   parseCalendarDate,
@@ -108,16 +110,21 @@ export class AvailabilityService {
       slots: template.map((slot) => {
         const booked = bookedBySlot.get(slot.value) ?? 0;
         const slotClosure = closureBySlot.get(slot.value);
+        // A time that has already come round today is not bookable, however
+        // much space it has.
+        const passed = hasSlotPassed(date, slot.value, leadMinutes());
         // Without a configured cap every open slot stays bookable however
         // many people have already booked it (DEC-021).
         const remaining = capacity === null ? null : Math.max(0, capacity - booked);
 
+        const reason = slotClosure ?? (passed ? "Already passed" : undefined);
+
         return {
           ...slot,
           booked,
-          available: !slotClosure && (remaining === null || remaining > 0),
+          available: !reason && (remaining === null || remaining > 0),
           ...(capacity !== null ? { capacity, remaining: remaining ?? 0 } : {}),
-          ...(slotClosure ? { closedReason: slotClosure } : {}),
+          ...(reason ? { closedReason: reason } : {}),
         };
       }),
     };
@@ -163,12 +170,18 @@ export class AvailabilityService {
       cursor.setUTCDate(cursor.getUTCDate() + 1)
     ) {
       const dateStr = formatCalendarDate(cursor);
+      const allSlotsGone =
+        isLagosToday(cursor) &&
+        TIME_SLOTS.every((slot) => hasSlotPassed(cursor, slot.value, leadMinutes()));
+
       const reason =
         cursor < today
           ? "Date has passed"
           : CLOSED_WEEKDAYS.has(calendarWeekday(cursor))
             ? "Closed on Sundays"
-            : closedDates.get(dateStr);
+            : allSlotsGone
+              ? "No times left today"
+              : closedDates.get(dateStr);
 
       days.push({
         date: dateStr,

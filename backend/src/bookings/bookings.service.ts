@@ -11,7 +11,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { MembersService } from "../members/members.service";
 import { EmailService } from "../email/email.service";
 import { liveBookingWhere } from "../availability/availability.service";
-import { holdMinutes, slotCapacity } from "../common/capacity.config";
+import { holdMinutes, leadMinutes, slotCapacity } from "../common/capacity.config";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import {
   ALL_DAY,
@@ -21,6 +21,7 @@ import {
   SLOT_VALUES,
   WEEKDAY_NAMES,
   calendarWeekday,
+  hasSlotPassed,
   isWholeDayPlan,
   lagosToday,
   parseCalendarDate,
@@ -129,6 +130,12 @@ export class BookingsService {
       throw new BadRequestException(
         `${plan.name} runs on ${WEEKDAY_NAMES[planWeekday]}s only.`,
       );
+    }
+
+    // Checked server-side, not just in the UI: a stale page or a direct API
+    // call could otherwise book a time that has already come round.
+    if (hasSlotPassed(date, timeSlot, leadMinutes())) {
+      throw new BadRequestException("That time has already passed. Please pick a later one.");
     }
 
     const closure = await this.prisma.slotClosure.findFirst({

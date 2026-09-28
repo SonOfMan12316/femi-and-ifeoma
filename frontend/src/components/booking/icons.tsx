@@ -88,3 +88,54 @@ export function CupIcon({ className = "h-5 w-5" }: IconProps) {
     </svg>
   );
 }
+
+export function ClockIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+export function UsersIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19" />
+      <circle cx="10" cy="8" r="3.2" />
+      <path d="M20 19v-1.5a3.5 3.5 0 0 0-2.6-3.4M15.5 5.2a3.2 3.2 0 0 1 0 5.6" />
+    </svg>
+  );
+}
+
+export function LockIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg {...base} className={className} aria-hidden>
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ className = "h-3.5 w-3.5" }: IconProps) {
+  return (
+    <svg {...base} className={className} strokeWidth={2.4} aria-hidden>
+      <path d="M5 12.5 9.5 17 19 7" />
+    </svg>
+  );
+}
+
+/** Indeterminate progress. CSS-animated so it keeps spinning under load. */
+export function Spinner({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={`spinner ${className}`} fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="2.5" />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}

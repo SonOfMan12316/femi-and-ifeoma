@@ -27,3 +27,15 @@ export function holdMinutes(): number {
   const raw = Number(process.env.BOOKING_HOLD_MINUTES);
   return Number.isFinite(raw) && raw > 0 ? raw : 10;
 }
+
+/**
+ * How far ahead a booking must be made, in minutes. 0 means a slot is bookable
+ * right up to its start time; 30 would close the 11:00 slot at 10:30.
+ *
+ * Kept at 0 by default — the café has not asked for a cutoff, and guessing one
+ * would silently turn away guests who are already on their way.
+ */
+export function leadMinutes(): number {
+  const raw = Number(process.env.BOOKING_LEAD_MINUTES);
+  return Number.isFinite(raw) && raw >= 0 ? raw : 0;
+}
