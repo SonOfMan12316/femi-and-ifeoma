@@ -1,5 +1,13 @@
 # Fémi & Ifeoma Cat Café — Architecture
 
+> **Known mismatch:** the root `package.json` declares
+> `workspaces: ["frontend", "backend"]`, which contradicts the "no npm
+> workspaces" decision below. It is why `npm ci` cannot run inside `backend/`
+> — npm resolves the workspace root and looks for a lockfile that is
+> gitignored there. Deploys use `npm install` instead. Worth reconciling:
+> either drop `workspaces` (and the root convenience scripts that depend on
+> it) or commit a root lockfile and adopt workspaces properly.
+
 **Repo shape (as of 2026-08-11, DEC-014):** a plain two-folder monorepo — `frontend/` and `backend/` are two fully independent codebases (own `package.json`, own `node_modules`, own deploy target). No npm workspaces or shared tooling between them by design — the owner explicitly wanted the backend to not live inside the frontend's Next.js app.
 
 ## Project Structure
