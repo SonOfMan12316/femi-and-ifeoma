@@ -7,7 +7,7 @@ import { site, plansFromPrice } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: `Book Your Visit · ${site.fullName}`,
-  description: `Reserve your spot at ${site.fullName}. Plans start at ₦${plansFromPrice.toLocaleString("en-NG")} per person, with the cats, the lounge, and a complimentary drink.`,
+  description: `Reserve your spot at ${site.fullName}. A 60-minute Solo Pass with the cats, the lounge and a complimentary drink — or the Co-Work Space from ₦${plansFromPrice.toLocaleString("en-NG")} a day.`,
 };
 
 export default function BookYourVisitPage() {

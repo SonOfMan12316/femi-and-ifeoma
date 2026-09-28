@@ -6,8 +6,10 @@ type ContentBlockProps = {
   eyebrow: string;
   title: string;
   body: string;
-  ctaLabel: string;
-  ctaHref: string;
+  /* Optional: a block that introduces content sitting directly below it
+     doesn't need a button pointing away from the page. */
+  ctaLabel?: string;
+  ctaHref?: string;
   image?: { src: string; alt: string };
   reverse?: boolean;
   external?: boolean;
@@ -38,7 +40,7 @@ export function ContentBlock({
                 src={image.src}
                 alt={image.alt}
                 fill
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                className="group-zoom object-cover transition-transform duration-[250ms] ease-[var(--ease-out)]"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
@@ -55,15 +57,17 @@ export function ContentBlock({
           <p className="mt-5 text-[16.5px] font-light leading-[1.8] text-[var(--ink-muted)]">
             {body}
           </p>
+          {ctaLabel && ctaHref && (
           <a
             href={ctaHref}
             {...(external
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            className="mt-9 inline-flex items-center rounded-xl bg-brick px-8 py-3.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange hover:shadow-[0_6px_16px_rgba(176,56,37,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/30 focus-visible:ring-offset-2"
+            className="mt-9 inline-flex items-center rounded-xl bg-brick px-8 py-3.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-white shadow-sm hover-lift transition-[transform,background-color,box-shadow] duration-200 ease-[var(--ease-out)] hover:bg-orange hover:shadow-[0_6px_16px_rgba(176,56,37,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brick/30 focus-visible:ring-offset-2"
           >
             {ctaLabel}
           </a>
+          )}
         </Reveal>
       </div>
     </section>

@@ -35,18 +35,18 @@ export function Cats() {
         <div className="grid grid-cols-1 gap-x-7 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
           {cats.map((cat, index) => (
             <Reveal key={cat.id} delayMs={index * 70}>
-              <article className="group cursor-default transition-transform duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[5px]">
+              <article className="hover-lift group cursor-default transition-transform duration-[250ms] ease-[var(--ease-out)]">
 
                 {/* Photo */}
                 <div
-                  className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand transition-shadow duration-[360ms] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.13),0_4px_12px_rgba(0,0,0,0.06)]"
+                  className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-sand transition-shadow duration-[250ms] ease-[var(--ease-out)] group-hover:shadow-[0_16px_40px_rgba(0,0,0,0.13),0_4px_12px_rgba(0,0,0,0.06)]"
                   style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}
                 >
                   <FadeImage
                     src={cat.photo}
                     alt={`${cat.name}, ${cat.breed}`}
                     fill
-                    className="object-cover transition-transform duration-[420ms] ease-out group-hover:scale-[1.04]"
+                    className="group-zoom object-cover transition-transform duration-[250ms] ease-[var(--ease-out)]"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>

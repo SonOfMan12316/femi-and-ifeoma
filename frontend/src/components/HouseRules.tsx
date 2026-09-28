@@ -18,12 +18,22 @@ export function HouseRules() {
           </p>
         </Reveal>
 
+        {/*
+          One Reveal around the list, with the stagger on the items themselves.
+          Wrapping each <li> in Reveal would put a <div> between <ol> and <li>,
+          which is invalid HTML — so the children inherit the reveal from their
+          parent's is-visible class and offset their own transition-delay.
+
+          Decorative only: every rule is present and readable throughout; the
+          delay affects appearance, never availability.
+        */}
         <Reveal>
           <ol className="m-0 list-none space-y-0 p-0">
             {houseRules.map((rule, index) => (
               <li
                 key={rule}
-                className="flex gap-5 border-b border-[var(--ink-line)] py-5 text-[16px] font-light leading-[1.7] text-[var(--ink-muted)] first:pt-0 last:border-b-0"
+                className="stagger-child flex gap-5 border-b border-[var(--ink-line)] py-5 text-[16px] font-light leading-[1.7] text-[var(--ink-muted)] first:pt-0 last:border-b-0"
+                style={{ transitionDelay: `${index * 60}ms` }}
               >
                 <span className="w-7 shrink-0 font-display text-[18px] font-semibold italic text-orange/70 tabular-nums">
                   {String(index + 1).padStart(2, "0")}

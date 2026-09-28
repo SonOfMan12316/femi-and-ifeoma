@@ -65,10 +65,16 @@ const link =
 export function Footer() {
   return (
     <footer className="bg-black">
-      <div className="mx-auto max-w-3xl p-6 text-center">
+      <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
 
-        {/* ── Address · Hours · Contact ── */}
-        <div className="grid gap-12 sm:grid-cols-3 sm:gap-8">
+        {/* ── Logo · Address · Hours · Contact ── */}
+        <div className="flex flex-col gap-12 text-center sm:flex-row sm:justify-between sm:gap-8 sm:text-left">
+          <div>
+            {/* brightness-0 invert renders the dark logo white on #0C0C0C. */}
+            <Logo width={170} height={52} className="brightness-0 invert" />
+            <p className="mt-4 text-[13px] font-light text-orange">{site.brandTagline}</p>
+          </div>
+
           <div>
             <h3 className={label}>Address</h3>
             <p className={`mt-4 ${value}`}>
@@ -94,7 +100,7 @@ export function Footer() {
             <p className={`mt-4 ${value}`}>
               Monday – Saturday
               <br />
-              10 AM – 5 PM
+              10 AM – 8 PM
             </p>
             <p className="mt-2 text-[12px] font-light text-white/30">{site.closed}</p>
           </div>
@@ -115,7 +121,7 @@ export function Footer() {
         </div>
 
         {/* ── Social ── */}
-        <ul className="mt-4 flex items-center justify-center gap-8">
+        <ul className="mt-12 flex items-center justify-center gap-8 sm:justify-start">
           {socials.map((social) => (
             <li key={social.label}>
               <a
@@ -124,7 +130,7 @@ export function Footer() {
                 {...(social.external
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
-                className="inline-flex text-white/40 transition-[color,transform] duration-[250ms] ease-out hover:-translate-y-0.5 hover:text-orange motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                className="hover-lift inline-flex text-white/40 transition-[color,transform] duration-[250ms] ease-[var(--ease-out)] hover:text-orange"
               >
                 {social.icon}
               </a>
@@ -133,8 +139,8 @@ export function Footer() {
         </ul>
 
         {/* ── Copyright ── */}
-        <div className="mt-4 border-t border-white/[0.08] pt-10">
-          <p className="text-[12px] font-light text-white/30">
+        <div className="mt-12 border-t border-white/[0.08] pt-8">
+          <p className="text-center text-[12px] font-light text-white/30 sm:text-left">
             © 2026 {site.fullName}
           </p>
         </div>
