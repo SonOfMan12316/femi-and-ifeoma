@@ -107,6 +107,8 @@
   --booking-border:    rgba(12, 12, 12, 0.10);
   --booking-panel:     #FAFAFA;
   --booking-muted:     rgba(12, 12, 12, 0.50);
+  --error:             #C2410C;
+  --error-ring:        rgba(194, 65, 12, 0.12);
 
   /* Image fade duration — collapsed to 0s for reduced-motion users */
   --img-fade-duration: 0.65s;
@@ -357,6 +359,117 @@ body {
   .group:hover .group-zoom {
     transform: none;
   }
+}
+
+/* ─────────────────────────────────────────
+   Booking form controls
+───────────────────────────────────────── */
+
+.booking-input {
+  height: 44px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--booking-border);
+  background: #ffffff;
+  padding: 0 14px;
+  font-size: 15px;
+  color: var(--ink);
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+}
+
+.booking-input::placeholder {
+  color: var(--booking-muted);
+}
+
+.booking-input:focus {
+  outline: none;
+  border-color: var(--booking-accent);
+  box-shadow: 0 0 0 3px var(--booking-peach);
+}
+
+.booking-input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.booking-input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px var(--error-ring);
+}
+
+/* Chrome paints autofilled inputs a hard blue that ignores background-color.
+   An inset shadow the size of the field is the only reliable override. */
+.booking-input:-webkit-autofill,
+.booking-input:-webkit-autofill:hover,
+.booking-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: var(--ink);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.booking-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset, 0 0 0 3px var(--booking-peach);
+  box-shadow: 0 0 0 1000px #ffffff inset, 0 0 0 3px var(--booking-peach);
+}
+
+/* Custom checkbox — the native control cannot be styled to the brand. */
+.booking-check {
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  border: 1px solid var(--booking-border);
+  background: #ffffff;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out);
+}
+
+.booking-check::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  transform: scale(0);
+  transition: transform 150ms var(--ease-out);
+  background-color: #ffffff;
+  clip-path: polygon(14% 44%, 0 59%, 39% 100%, 100% 22%, 84% 7%, 39% 70%);
+}
+
+.booking-check:checked {
+  background-color: var(--booking-accent);
+  border-color: var(--booking-accent);
+}
+
+.booking-check:checked::after {
+  transform: scale(1);
+}
+
+.booking-check:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--booking-peach);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-check::after {
+    transition: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Spinner
+───────────────────────────────────────── */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 700ms linear infinite;
 }
 
 /* ─────────────────────────────────────────

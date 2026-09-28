@@ -7,7 +7,18 @@ import { Button } from "@/components/Button";
 import { PassCard } from "@/components/PassCard";
 import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { BookingSummary } from "@/components/booking/BookingSummary";
-import { ArrowLeft, CupIcon, LaptopIcon, Minus, Plus } from "@/components/booking/icons";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckIcon,
+  CupIcon,
+  LaptopIcon,
+  LockIcon,
+  Minus,
+  Plus,
+  Spinner,
+} from "@/components/booking/icons";
+import { BookingDetailsSummary } from "@/components/booking/BookingDetailsSummary";
 import {
   ApiError,
   createBooking,
@@ -70,6 +81,32 @@ function formatDuration(plan: Plan): string {
   const hours = plan.durationMins / 60;
   if (Number.isInteger(hours)) return `${hours} hour${hours === 1 ? "" : "s"}`;
   return `${Math.floor(hours)} hr ${plan.durationMins % 60} min`;
+}
+
+/** Field-level validation. Returns a message, or null when the field is fine. */
+function validateField(key: keyof Info, info: Info): string | null {
+  switch (key) {
+    case "firstName":
+      return info.firstName.trim() ? null : "Please enter your first name.";
+    case "lastName":
+      return info.lastName.trim() ? null : "Please enter your last name.";
+    case "email":
+      if (!info.email.trim()) return "Please enter your email address.";
+      // Deliberately loose: the only authority on whether an address works is
+      // whether mail reaches it, and strict patterns reject valid addresses.
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(info.email.trim())
+        ? null
+        : "That doesn't look like an email address.";
+    case "phone":
+      if (!info.phone.trim()) return "Please enter a phone number.";
+      return info.phone.replace(/\D/g, "").length >= 10
+        ? null
+        : "That phone number looks too short.";
+    case "agreed":
+      return info.agreed ? null : "Please agree to the house rules to continue.";
+    default:
+      return null;
+  }
 }
 
 /** Display total, mirroring the backend's amount calculation (DEC-018). */
@@ -179,6 +216,12 @@ export function BookingFlow() {
   const [dayData, setDayData] = useState<DayAvailability | null>(null);
   const [dayLoading, setDayLoading] = useState(false);
   const [dayError, setDayError] = useState<string | null>(null);
+
+  // Which fields the guest has left, so errors appear on blur rather than
+  // scolding them mid-typing.
+  const [touched, setTouched] = useState<Partial<Record<keyof Info, boolean>>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -446,7 +489,19 @@ export function BookingFlow() {
      */
     async function handlePay(e: React.FormEvent) {
       e.preventDefault();
-      if (!info.agreed || !selectedDate || !selectedSlot || submitting) return;
+      if (submitting || !selectedDate || !selectedSlot) return;
+
+      setSubmitAttempted(true);
+      const firstInvalid = (["firstName", "lastName", "email", "phone", "agreed"] as const).find(
+        (key) => validateField(key, info) !== null,
+      );
+      if (firstInvalid) {
+        // Take the guest to the problem rather than leaving them to hunt for it.
+        const el = formRef.current?.querySelector<HTMLElement>(`[data-field="${firstInvalid}"]`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        el?.focus({ preventScroll: true });
+        return;
+      }
 
       setSubmitting(true);
       setSubmitError(null);
@@ -536,97 +591,192 @@ export function BookingFlow() {
       handler.openIframe();
     }
 
+    const total = plan.perPerson ? plan.price * partySize : plan.price;
+    const timeWindow = plan.wholeDay
+      ? (selectedSlot?.label ?? "All day, 10 AM – 8 PM")
+      : (selectedSlot?.label ?? "");
+
+    /** An error is only shown once the guest has left the field, or tried to submit. */
+    const errorFor = (key: keyof Info) =>
+      touched[key] || submitAttempted ? validateField(key, info) : null;
+
+    const fields = [
+      { key: "firstName", label: "First name", type: "text", autoComplete: "given-name" },
+      { key: "lastName", label: "Last name", type: "text", autoComplete: "family-name" },
+      { key: "email", label: "Email", type: "email", autoComplete: "email" },
+      {
+        key: "phone",
+        label: "Phone number",
+        type: "tel",
+        autoComplete: "tel",
+        inputMode: "tel" as const,
+        placeholder: "0802 345 6789",
+      },
+    ] as const;
+
+    const agreedError = errorFor("agreed");
+
     return (
       <div className="step-enter" data-direction={stepDirection}>
         <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
 
-        {/* Booking summary */}
-        <div className="mb-4 border border-[var(--ink-line)] bg-sand px-8 py-6">
-          <button
-            type="button"
-            onClick={() => goToStep("datetime", "back")}
-            className="mb-4 flex items-center gap-2 text-[12px] uppercase tracking-wide text-[var(--ink-muted)] hover:text-brick"
-          >
-            ‹ Back
-          </button>
-          <p className="text-[13px] font-medium text-brick">{plan.name}</p>
-          <p className="mt-0.5 text-[13px] text-[var(--ink-muted)]">
-            {plan.wholeDay
-              ? `Day pass @ ₦${plan.price.toLocaleString("en-NG")} per person`
-              : `${plan.durationMins} minutes @ ₦${plan.price.toLocaleString("en-NG")}`}{" "}
-            &middot; {partySize} guest{partySize === 1 ? "" : "s"}
-          </p>
-          {selectedDate && selectedSlot && (
-            <p className="mt-0.5 text-[13px] text-[var(--ink-muted)]">
-              {formatDateStr(selectedDate)}
-              {plan.wholeDay ? ` · ${selectedSlot.label}` : ` at ${selectedSlot.label}`}
-            </p>
-          )}
-        </div>
+        <div className="overflow-hidden rounded-2xl border border-[var(--booking-border)] bg-white shadow-[var(--shadow-sm)]">
 
-        {/* Form */}
-        <form onSubmit={handlePay} className="border border-[var(--ink-line)] bg-sand px-8 py-8">
-          <p className="mb-6 text-[11px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
-            Your Information
-          </p>
-
-          <div className="grid gap-5 md:grid-cols-2">
-            {(
-              [
-                { label: "First Name", key: "firstName", type: "text" },
-                { label: "Last Name",  key: "lastName",  type: "text" },
-                { label: "Email",      key: "email",     type: "email" },
-                { label: "Phone",      key: "phone",     type: "tel" },
-              ] as const
-            ).map(({ label, key, type }) => (
-              <div key={key}>
-                <label className="mb-1.5 block text-[12px] uppercase tracking-wide text-[var(--ink-muted)]">
-                  {label} <span className="text-orange">*</span>
-                </label>
-                <input
-                  type={type}
-                  required
-                  value={info[key]}
-                  onChange={(e) => setInfo((prev) => ({ ...prev, [key]: e.target.value }))}
-                  className="w-full rounded-lg border border-[var(--ink-line)] bg-white px-4 py-3 text-[14px] text-brick outline-none focus:border-brick"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 flex items-start gap-3">
-            <input
-              id="agreed"
-              type="checkbox"
-              checked={info.agreed}
-              onChange={(e) => setInfo((prev) => ({ ...prev, agreed: e.target.checked }))}
-              className="mt-0.5 h-4 w-4 accent-brick"
-            />
-            <label htmlFor="agreed" className="text-[13px] font-light leading-relaxed text-[var(--ink-muted)]">
-              I agree to behave gently around the cats, follow house rules, and understand that{" "}
-              {site.fullName} is not liable for injuries caused by my own actions.
-            </label>
-          </div>
-
-          {submitError && (
-            <p className="mt-6 rounded-lg border border-orange px-4 py-3 text-[13px] text-orange">
-              {submitError}
-            </p>
-          )}
-
-          <div className="mt-8 flex items-center justify-between border-t border-[var(--ink-line)] pt-6">
-            <p className="text-[15px] font-medium text-brick">
-              Total: ₦{totalFor(plan, qty).toLocaleString("en-NG")}
-            </p>
+          {/* ── Header: back · progress ── */}
+          <div className="flex items-center gap-4 border-b border-[var(--booking-border)] px-5 py-4">
             <button
-              type="submit"
-              disabled={!info.agreed || submitting}
-              className="rounded-lg bg-brick px-10 py-4 text-[13px] font-medium uppercase tracking-[0.1em] text-white transition-colors hover:bg-orange disabled:cursor-not-allowed disabled:opacity-50"
+              type="button"
+              onClick={() => goToStep("datetime", "back")}
+              aria-label="Back to choosing a date"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--booking-border)] text-[var(--ink)] transition-colors duration-150 ease-[var(--ease-out)] hover:bg-[var(--booking-peach)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--booking-accent)] focus-visible:ring-offset-2"
             >
-              {submitting ? "Holding your spot…" : "Continue to Payment"}
+              <ArrowLeft />
             </button>
+
+            <ol className="flex items-center gap-2 text-[13px]">
+              <li className="flex items-center gap-1.5 text-[var(--booking-muted)]">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--booking-accent)] text-white">
+                  <CheckIcon className="h-2.5 w-2.5" />
+                </span>
+                Date
+              </li>
+              <li aria-hidden className="text-[var(--booking-muted)]">›</li>
+              <li className="font-medium text-[var(--booking-accent)]" aria-current="step">
+                Your details
+              </li>
+            </ol>
           </div>
-        </form>
+
+          {/* Summary sits above the form on mobile (order-first) and beside it
+              on desktop, where it sticks while the form scrolls. */}
+          <div className="grid grid-cols-1 md:grid-cols-[60fr_40fr]">
+            <div className="order-2 md:order-1">
+              <form ref={formRef} onSubmit={handlePay} noValidate className="px-5 py-6 md:px-6">
+                <h2 className="text-[16px] font-medium text-[var(--ink)]">Your details</h2>
+                <p className="mt-1 text-[13px] text-[var(--booking-muted)]">
+                  We&apos;ll send your booking confirmation here.
+                </p>
+
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  {fields.map((field) => {
+                    const error = errorFor(field.key);
+                    return (
+                      <div key={field.key}>
+                        <label
+                          htmlFor={field.key}
+                          className="mb-1.5 block text-[13px] text-[var(--ink)]"
+                        >
+                          {field.label} <span className="text-[var(--booking-accent)]">*</span>
+                        </label>
+                        <input
+                          id={field.key}
+                          data-field={field.key}
+                          type={field.type}
+                          autoComplete={field.autoComplete}
+                          inputMode={"inputMode" in field ? field.inputMode : undefined}
+                          placeholder={"placeholder" in field ? field.placeholder : undefined}
+                          value={info[field.key]}
+                          aria-invalid={error ? true : undefined}
+                          aria-describedby={error ? `${field.key}-error` : undefined}
+                          onChange={(e) =>
+                            setInfo((prev) => ({ ...prev, [field.key]: e.target.value }))
+                          }
+                          onBlur={() => setTouched((t) => ({ ...t, [field.key]: true }))}
+                          className="booking-input"
+                        />
+                        {error && (
+                          <p id={`${field.key}-error`} className="mt-1.5 text-[12px] text-[var(--error)]">
+                            {error}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Whole box is the control — a 18px checkbox is a small target. */}
+                <label
+                  data-field="agreed"
+                  tabIndex={-1}
+                  className={`mt-5 flex cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors duration-150 ease-[var(--ease-out)] ${
+                    agreedError
+                      ? "border-[var(--error)] bg-white"
+                      : "border-[var(--booking-border)] bg-[var(--booking-panel)]"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={info.agreed}
+                    onChange={(e) => {
+                      setInfo((prev) => ({ ...prev, agreed: e.target.checked }));
+                      setTouched((t) => ({ ...t, agreed: true }));
+                    }}
+                    aria-invalid={agreedError ? true : undefined}
+                    aria-describedby={agreedError ? "agreed-error" : undefined}
+                    className="booking-check mt-0.5"
+                  />
+                  <span className="text-[13px] font-light leading-relaxed text-[var(--ink-muted)]">
+                    I agree to behave gently around the cats, follow house rules, and understand that{" "}
+                    {site.fullName} is not liable for injuries caused by my own actions.
+                  </span>
+                </label>
+                {agreedError && (
+                  <p id="agreed-error" className="mt-1.5 text-[12px] text-[var(--error)]">
+                    {agreedError}
+                  </p>
+                )}
+
+                {submitError && (
+                  <p className="mt-5 rounded-xl border border-[var(--error)] px-4 py-3 text-[13px] text-[var(--error)]">
+                    {submitError}
+                  </p>
+                )}
+
+                {/* Desktop: button only — the total is already in the summary.
+                    Mobile: the bar sticks to the viewport with the total beside it. */}
+                <div className="sticky bottom-0 -mx-5 mt-6 flex items-center justify-between gap-4 border-t border-[var(--booking-border)] bg-white px-5 py-4 md:static md:mx-0 md:border-0 md:bg-transparent md:px-0 md:pb-0 md:pt-6">
+                  <p className="text-[14px] text-[var(--ink)] md:hidden">
+                    Total{" "}
+                    <span className="font-medium">₦{total.toLocaleString("en-NG")}</span>
+                  </p>
+                  <button
+                    type="submit"
+                    className="ml-auto flex h-12 items-center justify-center gap-2 rounded-full bg-[var(--booking-accent)] px-6 text-[15px] font-medium text-white transition-opacity duration-150 ease-[var(--ease-out)] hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--booking-accent)] focus-visible:ring-offset-2 disabled:opacity-60"
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <Spinner />
+                        Processing…
+                      </>
+                    ) : (
+                      <>
+                        <LockIcon />
+                        Continue to payment
+                        <ArrowRight />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="order-1 border-b border-[var(--booking-border)] bg-[var(--booking-panel)] md:order-2 md:border-b-0 md:border-l">
+              <div className="md:sticky md:top-24">
+                {selectedDate && (
+                  <BookingDetailsSummary
+                    plan={plan}
+                    selectedDate={selectedDate}
+                    timeWindow={timeWindow}
+                    partySize={partySize}
+                    total={total}
+                    onChange={() => goToStep("datetime", "back")}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
