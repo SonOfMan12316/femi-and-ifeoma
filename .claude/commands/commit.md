@@ -178,9 +178,29 @@ Token changes in `globals.css` deserve particular care: a renamed or retimed
 - Check for stray debug output and scratch files. Temporary scripts belong in
   the scratchpad directory, not the repo.
 
+## Always open a PR
+
+A push is not the end of the job. **Open the PR in the same turn** — do not
+push and then ask whether to open one.
+
+A pushed branch with no PR is invisible work, and in this repo it is also
+undeployed work: Render builds the backend from `main` and Vercel builds the
+frontend from `main`, so nothing reaches production until a PR merges.
+
+```
+gh pr create --base dev  --head <feature-branch>   # feature work
+gh pr create --base main --head dev                # anything that must deploy
+```
+
+Run the checks for each side being changed *before* opening, and state any
+failure in the PR body rather than opening over it quietly. Say plainly what
+was verified and what was not — "build passes" and "I looked at it" are
+different claims.
+
 ## Do not
 
 - Combine unrelated changes because they are small.
+- Push without opening a PR.
 - Commit generated output — `frontend/.next/`, `backend/dist/`,
   `tsconfig.tsbuildinfo` — or editor files.
 - Push. Only push when the user asks.
