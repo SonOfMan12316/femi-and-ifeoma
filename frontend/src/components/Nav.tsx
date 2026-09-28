@@ -66,7 +66,7 @@ export function Nav() {
         out of the tab order and off screen readers.
       */}
       <div
-        className="collapse lg:hidden [transition-timing-function:var(--ease-drawer)] [transition-duration:var(--duration-drawer)]"
+        className="disclosure lg:hidden [transition-timing-function:var(--ease-drawer)] [transition-duration:var(--duration-drawer)]"
         data-open={open}
         inert={!open}
       >

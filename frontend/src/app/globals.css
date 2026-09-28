@@ -251,7 +251,11 @@ body {
 }
 
 /* ─────────────────────────────────────────
-   Collapse (FAQ answers, mobile nav drawer)
+   Disclosure (FAQ answers, mobile nav drawer)
+
+   NOT named `.collapse` — Tailwind ships a `collapse` utility that sets
+   `visibility: collapse`, and both rules would apply, leaving the panel
+   animated but invisible.
 
    grid-template-rows 0fr → 1fr animates to the content's natural height
    without measuring it in JS and without animating to `auto`. The child must
@@ -262,7 +266,7 @@ body {
    duration is deliberately short.
 ───────────────────────────────────────── */
 
-.collapse {
+.disclosure {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
@@ -271,12 +275,12 @@ body {
     opacity var(--duration-collapse) var(--ease-out);
 }
 
-.collapse > * {
+.disclosure > * {
   overflow: hidden;
   min-height: 0;
 }
 
-.collapse[data-open="true"] {
+.disclosure[data-open="true"] {
   grid-template-rows: 1fr;
   opacity: 1;
 }
@@ -549,9 +553,9 @@ body {
     animation: none;
   }
 
-  /* Collapses keep their fade — it explains the state change — but stop
+  /* Disclosures keep their fade — it explains the state change — but stop
      animating size, which is the part that reads as movement. */
-  .collapse {
+  .disclosure {
     transition: opacity 120ms var(--ease-out);
   }
 
