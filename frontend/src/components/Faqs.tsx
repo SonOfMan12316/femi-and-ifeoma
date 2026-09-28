@@ -52,11 +52,11 @@ export function Faqs() {
                   </button>
                   {/*
                     Always rendered, never conditionally mounted — a transition
-                    needs both states to exist. `.collapse` animates
+                    needs both states to exist. `.disclosure` animates
                     grid-template-rows 0fr → 1fr, so it opens to the answer's
                     natural height without measuring it.
                   */}
-                  <div className="collapse" data-open={open} aria-hidden={!open}>
+                  <div className="disclosure" data-open={open} aria-hidden={!open}>
                     <div>
                       <p className="pb-5 text-[16px] font-light leading-relaxed text-[var(--ink-muted)]">
                         {faq.answer}
